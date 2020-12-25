@@ -1,0 +1,90 @@
+package nl.tvandijk.aoc.day21;
+
+import nl.tvandijk.aoc.common.AoCCommon;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RuleContext;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class Day21 extends AoCCommon {
+    private final Map<String, List<String>> allergens = new HashMap<>();
+    private final List<List<String>> products = new LinkedList<>();
+
+    public void propagate() {
+        Queue<String> toDo = new LinkedList<>();
+        Set<String> seen = new HashSet<>();
+
+        for (var entry : allergens.entrySet()) {
+            if (entry.getValue().size() == 1) {
+                seen.add(entry.getKey());
+                toDo.add(entry.getKey());
+            }
+        }
+
+        while (!toDo.isEmpty()) {
+            var nextAllergen = toDo.poll();
+            var ingredient = allergens.get(nextAllergen).get(0);
+            for (var entry : allergens.entrySet()) {
+                if (seen.contains(entry.getKey())) continue;
+
+                if (entry.getValue().remove(ingredient)) {
+                    if (entry.getValue().size() == 1) {
+                        seen.add(entry.getKey());
+                        toDo.add(entry.getKey());
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void process(InputStream stream) throws IOException {
+        var lexer = new IngredientsLexer(CharStreams.fromStream(stream));
+        var parser = new IngredientsParser(new CommonTokenStream(lexer));
+
+        for (var productCtx : parser.products().product()) {
+            var ingredients = productCtx.ingredient().stream()
+                    .map(RuleContext::getText)
+                    .collect(Collectors.toList());
+
+            products.add(ingredients);
+
+            for (var allergenCtx : productCtx.allergen()) {
+                String allergen = allergenCtx.getText();
+
+                allergens.compute(allergen, (key, value) -> {
+                    if (value == null) {
+                        value = new LinkedList<>(ingredients);
+                    } else {
+                        value.retainAll(ingredients);
+                    }
+                    return value;
+                });
+            }
+        }
+
+        propagate();
+
+        var dangerous = allergens.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(Map.Entry::getValue)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        var count = products.stream()
+                .flatMap(Collection::stream)
+                .filter(x -> !dangerous.contains(x))
+                .count();
+
+        System.out.println("Dangerous ingredients: " + String.join(",", dangerous));
+        System.out.println("Safe count: " + count);
+    }
+
+    public static void main(String[] args) {
+        run(Day21::new, "example.txt", "input.txt");
+    }
+}
