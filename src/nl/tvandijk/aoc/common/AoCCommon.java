@@ -6,7 +6,7 @@ public abstract class AoCCommon {
     protected abstract void process(InputStream stream) throws Exception;
 
     protected void go(String filename) {
-        System.out.println("File: " + filename);
+        System.out.printf("File: %s%n", filename);
 
         try (var inp = getClass().getResourceAsStream(filename)) {
             if (inp == null) {
@@ -18,7 +18,7 @@ public abstract class AoCCommon {
             process(inp);
             long after = System.nanoTime();
 
-            System.out.printf("Elapsed time: %.0f ms\n\n", ((double)(after-before))/1000000);
+            System.out.printf("Elapsed time: %.0f ms%n%n", ((double)(after-before))/1000000);
         } catch (Exception e) {
             e.printStackTrace();
         }
