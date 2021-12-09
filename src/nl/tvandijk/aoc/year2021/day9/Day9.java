@@ -4,7 +4,6 @@ import nl.tvandijk.aoc.common.Day;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class Day9 extends Day {
