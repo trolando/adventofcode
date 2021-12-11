@@ -1,18 +1,15 @@
 package nl.tvandijk.aoc.year2021.day11;
 
 import nl.tvandijk.aoc.common.Day;
-import org.antlr.v4.runtime.CharStreams;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
 import java.util.Queue;
 
 public class Day11 extends Day {
-    int[] grid;
-    Queue<Integer> toflash;
-    boolean[] flashed;
-    int flashes = 0;
+    private int[] grid;
+    private boolean[] flashed;
+    private Queue<Integer> flashQueue;
+    private int flashCount = 0;
 
     private static int idx(int x, int y) {
         return x+10*y;
@@ -21,36 +18,33 @@ public class Day11 extends Day {
     private void propagate(int x, int y) {
         if (x >= 0 && x < 10 && y >= 0 && y < 10) {
             int i = idx(x, y);
-            if (flashed[i]) return;
-
-            grid[i]++;
-
-            if (grid[i] >= 10) {
-                flashes++;
-                grid[i] = 0;
-                toflash.add(i);
-                flashed[i] = true;
+            if (!flashed[i]) {
+                grid[i]++;
+                if (grid[i] >= 10) {
+                    flashQueue.add(i);
+                    flashed[i] = true;
+                }
             }
         }
     }
 
     private boolean step() {
-        toflash = new ArrayDeque<>();
         flashed = new boolean[grid.length];
 
         for (int i = 0; i < grid.length; i++) {
             grid[i]++;
-
             if (grid[i] >= 10) {
-                flashes++;
-                grid[i] = 0;
-                toflash.add(i);
+                flashQueue.add(i);
                 flashed[i] = true;
             }
         }
 
-        while (!toflash.isEmpty()) {
-            int i = toflash.poll();
+        while (!flashQueue.isEmpty()) {
+            int i = flashQueue.poll();
+
+            grid[i] = 0;
+            flashCount++;
+
             int x = i % 10;
             int y = i / 10;
 
@@ -71,41 +65,38 @@ public class Day11 extends Day {
         return true;
     }
 
-    @Override
-    protected void part1(String fileContents) {
+    private void parse(String fileContents) {
         grid = new int[100];
-        flashes = 0;
+        flashCount = 0;
+        flashQueue = new ArrayDeque<>();
 
         var justNumbers = fileContents.replaceAll("\\s+", "");
         for (int i = 0; i < 100; i++) {
             grid[i] = Integer.parseInt(String.valueOf(justNumbers.charAt(i)));
         }
+    }
+
+    @Override
+    protected void part1(String fileContents) {
+        parse(fileContents);
 
         for (int i=0; i<100; i++) {
             step();
         }
 
-        System.out.println("Part 1: " + flashes);
+        System.out.println("Part 1: " + flashCount);
     }
 
     @Override
     protected void part2(String fileContents) {
-        grid = new int[100];
-        flashes = 0;
+        parse(fileContents);
 
-        var justNumbers = fileContents.replaceAll("\\s+", "");
-        for (int i = 0; i < 100; i++) {
-            grid[i] = Integer.parseInt(String.valueOf(justNumbers.charAt(i)));
-        }
-
-        int steps = 0;
-        while (true) {
+        int steps = 1;
+        while (!step()) {
             steps++;
-            if (step()) {
-                System.out.println("Part 2: " + steps);
-                return;
-            }
         }
+
+        System.out.println("Part 2: " + steps);
     }
 
     public static void main(String[] args) {
