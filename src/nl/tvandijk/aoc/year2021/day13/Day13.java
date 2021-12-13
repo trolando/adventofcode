@@ -95,6 +95,8 @@ public class Day13 extends Day {
             }
             sb.append("\n");
         }
+
+        System.out.println("Part 2:");
         System.out.println(sb);
     }
 
