@@ -5,19 +5,23 @@ import nl.tvandijk.aoc.common.Day;
 import java.util.*;
 
 public class Day15 extends Day {
-    List<Integer> risk;
+    int[] risk;
     int size;
 
     private void parse(String fileContents) {
         var lines = fileContents.split("[\r\n]+");
         size = lines[0].trim().length();
 
-        risk = new ArrayList<>();
+        var riskList = new ArrayList<Integer>();
         for (int i = 0; i < fileContents.length(); i++) {
             int ch = fileContents.charAt(i);
             if (Character.isDigit(ch)) {
-                risk.add(Integer.valueOf(Character.toString(ch)));
+                riskList.add(Integer.valueOf(Character.toString(ch)));
             }
+        }
+        this.risk = new int[riskList.size()];
+        for (int i = 0; i < riskList.size(); i++) {
+            this.risk[i] = riskList.get(i);
         }
     }
 
@@ -26,44 +30,75 @@ public class Day15 extends Day {
         int origy = y%size;
         int dx = x/size;
         int dy = y/size;
-        int a = (risk.get(origx + origy*size) + dx + dy);
-        while (a > 9) a -= 9;
-        return a;
+        int a = risk[origx + origy*size] + dx + dy;
+        return 1 + (a-1) % 9;
     }
 
     private int computeRisk(int totsize) {
-        List<Integer> unvisited = new ArrayList<>();
         Map<Integer, Integer> distance = new HashMap<>();
+        PriorityQueue<Integer> unvisited = new PriorityQueue<>(Comparator.comparingInt(distance::get));
         distance.put(totsize*totsize-1, 0);
         unvisited.add(totsize*totsize-1);
         while (!unvisited.isEmpty()) {
-            // find next unvisited with non infinite distance
-            unvisited.sort(Comparator.comparingInt(x -> distance.getOrDefault(x, Integer.MAX_VALUE)).reversed());
-            int v = unvisited.get(unvisited.size()-1);
-            unvisited.remove(unvisited.size()-1);
-            if (!distance.containsKey(v)) break; // done
+            int v = unvisited.poll();
             int x = v%totsize;
             int y = v/totsize;
             int d = distance.get(v) + getRisk(x, y);
             if (x > 0) {
                 int nv = (x - 1) + y * totsize;
-                if (!distance.containsKey(nv)) unvisited.add(nv);
-                distance.compute(nv, (key, val) -> val == null ? d : Math.min(val, d));
+                if (distance.containsKey(nv)) {
+                    int cur = distance.get(nv);
+                    if (cur > d) {
+                        unvisited.remove(nv);
+                        distance.put(nv, d);
+                        unvisited.add(nv);
+                    }
+                } else {
+                    distance.put(nv, d);
+                    unvisited.add(nv);
+                }
             }
-            if ((x+1) < totsize) {
+            if ((x + 1) < totsize) {
                 int nv = (x + 1) + y * totsize;
-                if (!distance.containsKey(nv)) unvisited.add(nv);
-                distance.compute(nv, (key, val) -> val == null ? d : Math.min(val, d));
+                if (distance.containsKey(nv)) {
+                    int cur = distance.get(nv);
+                    if (cur > d) {
+                        unvisited.remove(nv);
+                        distance.put(nv, d);
+                        unvisited.add(nv);
+                    }
+                } else {
+                    distance.put(nv, d);
+                    unvisited.add(nv);
+                }
             }
             if (y > 0) {
-                int nv = x + (y-1) * totsize;
-                if (!distance.containsKey(nv)) unvisited.add(nv);
-                distance.compute(nv, (key, val) -> val == null ? d : Math.min(val, d));
+                int nv = x + (y - 1) * totsize;
+                if (distance.containsKey(nv)) {
+                    int cur = distance.get(nv);
+                    if (cur > d) {
+                        unvisited.remove(nv);
+                        distance.put(nv, d);
+                        unvisited.add(nv);
+                    }
+                } else {
+                    distance.put(nv, d);
+                    unvisited.add(nv);
+                }
             }
-            if ((y+1) < totsize) {
-                int nv = x + (y+1) * totsize;
-                if (!distance.containsKey(nv)) unvisited.add(nv);
-                distance.compute(nv, (key, val) -> val == null ? d : Math.min(val, d));
+            if ((y + 1) < totsize) {
+                int nv = x + (y + 1) * totsize;
+                if (distance.containsKey(nv)) {
+                    int cur = distance.get(nv);
+                    if (cur > d) {
+                        unvisited.remove(nv);
+                        distance.put(nv, d);
+                        unvisited.add(nv);
+                    }
+                } else {
+                    distance.put(nv, d);
+                    unvisited.add(nv);
+                }
             }
         }
         return distance.get(0);
@@ -74,7 +109,6 @@ public class Day15 extends Day {
         parse(fileContents);
         System.out.println("Part 1: " + computeRisk(size));
     }
-
 
     @Override
     protected void part2(String fileContents) {
