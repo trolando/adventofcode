@@ -22,28 +22,16 @@ public class Day17 extends Day {
             this.ty2 = ty2;
         }
 
-        private boolean inTarget() {
-            return x >= tx1 && x <= tx2 && y >= ty1 && y <= ty2;
-        }
-
-        private boolean overTarget() {
-            return x > tx2 || y < ty1;
-        }
-
-        private void step() {
-            x += dx;
-            y += dy;
-            if (dx < 0) dx += 1;
-            if (dx > 0) dx -= 1;
-            dy -= 1;
-        }
-
         private int run() {
             int highestY = 0;
-            while (!overTarget()) {
-                step();
+            while (x <= tx2 && y >= ty1) {
+                x += dx;
+                y += dy;
+                if (dx < 0) dx += 1;
+                if (dx > 0) dx -= 1;
+                dy -= 1;
                 highestY = Math.max(highestY, y);
-                if (inTarget()) return highestY;
+                if (x >= tx1 && x <= tx2 && y >= ty1 && y <= ty2) return highestY;
             }
             return Integer.MIN_VALUE;
         }
@@ -65,7 +53,6 @@ public class Day17 extends Day {
         }
         System.out.println("Part 1: " + high);
     }
-
 
     @Override
     protected void part2(String fileContents) {
