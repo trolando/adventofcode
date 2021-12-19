@@ -56,6 +56,10 @@ public class Day19 extends Day {
             };
         }
 
+        public int dist(Pos3 other) {
+            return Math.abs(other.x-x) + Math.abs(other.y-y) + Math.abs(other.z-z);
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -89,6 +93,7 @@ public class Day19 extends Day {
 
     private static class Scanner {
         final List<Pos3> beacons;
+        int[][] fingerprint;
 
         public Scanner() {
             this.beacons = new ArrayList<>();
@@ -103,6 +108,45 @@ public class Day19 extends Day {
             for (var b : other.beacons) {
                 this.beacons.add(b.up(up).rot(rot));
             }
+        }
+
+        public int[][] finger() {
+            if (fingerprint == null) {
+                fingerprint = new int[beacons.size()][beacons.size()];
+                for (int i = 0; i < beacons.size(); i++) {
+                    for (int j=0; j<beacons.size(); j++) {
+                        fingerprint[i][j] = beacons.get(i).dist(beacons.get(j));
+                    }
+                    Arrays.sort(fingerprint[i]);
+                }
+            }
+            return fingerprint;
+        }
+
+        public boolean fingerMatch(Scanner other) {
+            for (int i = 0; i < beacons.size(); i++) {
+                for (int j = 0; j < other.beacons.size(); j++) {
+                    var p1 = finger()[i];
+                    var p2 = other.finger()[j];
+                    // check if fingerprint matches
+                    int x = 0;
+                    int y = 0;
+                    int count = 0;
+                    while (x < p1.length && y < p2.length) {
+                        if (p1[x] == p2[y]) {
+                            x++;
+                            y++;
+                            count++;
+                            if (count >= 12) return true;
+                        } else if (p1[x] > p2[y]) {
+                            y++;
+                        } else if (p1[x] < p2[y]) {
+                            x++;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         private Pos3 test(Scanner other) {
@@ -202,11 +246,13 @@ public class Day19 extends Day {
             var front = frontier.poll();
             for (int i = 0; i < scanners.length; i++) {
                 if (position[i] == null) {
-                    var match = orientation[front].match(scanners[i]);
-                    if (match != null) {
-                        orientation[i] = match.a; // correct orientation!
-                        position[i] = new Pos3(position[front], match.b);
-                        frontier.add(i);
+                    if (scanners[front].get(0, 0).fingerMatch(scanners[i].get(0, 0))) {
+                        var match = orientation[front].match(scanners[i]);
+                        if (match != null) {
+                            orientation[i] = match.a; // correct orientation!
+                            position[i] = new Pos3(position[front], match.b);
+                            frontier.add(i);
+                        }
                     }
                 }
             }
