@@ -2,12 +2,23 @@ package nl.tvandijk.aoc.year2021.day19;
 
 import nl.tvandijk.aoc.common.Day;
 
-import java.io.IOException;
-import java.io.PushbackReader;
-import java.io.StringReader;
 import java.util.*;
 
 public class Day19 extends Day {
+    private static class Pair <A, B> {
+        A a;
+        B b;
+
+        public Pair(A a, B b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        public static <A, B> Pair<A, B> of(A a, B b){
+            return new Pair<>(a, b);
+        }
+    }
+
     private static class Pos3 {
         int x;
         int y;
@@ -21,6 +32,28 @@ public class Day19 extends Day {
 
         public Pos3(Pos3 one, Pos3 two) {
             this(one.x+two.x, one.y+two.y, one.z+two.z);
+        }
+
+        public Pos3 up(int up) {
+            return switch (up) {
+                case 0 -> this;
+                case 1 -> new Pos3(x, -y, -z);
+                case 2 -> new Pos3(x, -z, y);
+                case 3 -> new Pos3(-y, -z, x);
+                case 4 -> new Pos3(-x, -z, -y);
+                case 5 -> new Pos3(y, -z, -x);
+                default -> null;
+            };
+        }
+
+        public Pos3 rot(int rot) {
+            return switch (rot) {
+                case 0 -> this;
+                case 1 -> new Pos3(-y, x, z);
+                case 2 -> new Pos3(-x, -y, z);
+                case 3 -> new Pos3(y, -x, z);
+                default -> null;
+            };
         }
 
         @Override
@@ -37,292 +70,170 @@ public class Day19 extends Day {
         }
     }
 
-    private static class Align {
-        Scanner sc;
-        int rot;
-        boolean dirx;
-        boolean diry;
-        boolean dirz;
+    private static class ScannerOrientation {
+        final Scanner[] variations;
 
-        public Align(Scanner sc, int rot, boolean dirx, boolean diry, boolean dirz) {
-            this.sc = sc;
-            this.rot = rot;
-            this.dirx = dirx;
-            this.diry = diry;
-            this.dirz = dirz;
-        }
-
-        public int getCount() {
-            return sc.pos.size();
-        }
-
-        public Pos3 get(int n) {
-            // xyz, xzy, yxz, yzx, zyx, zxy ??
-            var pos = sc.pos;
-            if (rot == 0) {
-                var px = pos.get(n).x;
-                var py = pos.get(n).y;
-                var pz = pos.get(n).z;
-                return new Pos3(dirx?-px:px, diry?-py:py, dirz?-pz:pz);
-            } else if (rot == 1) {
-                // swap xyz -> zyx
-                var px = pos.get(n).x;
-                var py = pos.get(n).z;
-                var pz = pos.get(n).y;
-                return new Pos3(dirx?-px:px, diry?-py:py, dirz?-pz:pz);
-            } else if (rot == 2) {
-                // swap xyz -> yxz
-                var px = pos.get(n).y;
-                var py = pos.get(n).x;
-                var pz = pos.get(n).z;
-                return new Pos3(dirx?-px:px, diry?-py:py, dirz?-pz:pz);
-            } else if (rot == 3){
-                // swap xyz -> xzy
-                var px = pos.get(n).y;
-                var py = pos.get(n).z;
-                var pz = pos.get(n).x;
-                return new Pos3(dirx?-px:px, diry?-py:py, dirz?-pz:pz);
-            } else if (rot == 4) {
-                var px = pos.get(n).z;
-                var py = pos.get(n).x;
-                var pz = pos.get(n).y;
-                return new Pos3(dirx?-px:px, diry?-py:py, dirz?-pz:pz);
-            } else {
-                var px = pos.get(n).z;
-                var py = pos.get(n).y;
-                var pz = pos.get(n).x;
-                return new Pos3(dirx?-px:px, diry?-py:py, dirz?-pz:pz);
+        public ScannerOrientation(Scanner sc) {
+            variations = new Scanner[24];
+            for (int up = 0; up < 6; up++) {
+                for (int rot = 0; rot < 4; rot++) {
+                    variations[rot + up*4] = new Scanner(sc, up, rot);
+                }
             }
+        }
+
+        public Scanner get(int up, int rot) {
+            return variations[rot + up*4];
         }
     }
 
     private static class Scanner {
-        int n;
+        final List<Pos3> beacons;
 
-        List<Pos3> pos = new ArrayList<>();
-
-        public Scanner(int n) {
-            this.n = n;
+        public Scanner() {
+            this.beacons = new ArrayList<>();
         }
 
-        public Scanner(Scanner sc, int rot, boolean dirx, boolean diry, boolean dirz) {
-            var a = new Align(sc, rot, dirx, diry, dirz);
-            for (int i = 0; i < a.getCount(); i++) {
-                pos.add(a.get(i));
+        public Scanner(Scanner other) {
+            this.beacons = new ArrayList<>(other.beacons);
+        }
+
+        public Scanner(Scanner other, int up, int rot) {
+            this.beacons = new ArrayList<>();
+            for (var b : other.beacons) {
+                this.beacons.add(b.up(up).rot(rot));
             }
         }
 
-        public Pos3 match(Align a) {
-            Set<Pos3> rels = new HashSet<>();
-            for (int i = 0; i < pos.size(); i++) {
-                for (int j = 0; j < a.getCount(); j++) {
-                    // REL
-                    var mine = pos.get(i);
-                    var their = a.get(j);
-                    rels.add(new Pos3(their.x - mine.x, their.y - mine.y, their.z - mine.z));
-                }
-            }
-            for (var rel : rels) {
-                int relX = rel.x;
-                int relY = rel.y;
-                int relZ = rel.z;
-
-                int count = 0;
-                for (int k = 0; k < pos.size(); k++) {
-                    for (int l = 0; l < a.getCount(); l++) {
-                        var m = pos.get(k);
-                        var n = a.get(l);
-                        if (relX + m.x == n.x &&
-                            relY + m.y == n.y &&
-                            relZ + m.z == n.z) {
-                            count++;
-                            break;
+        private Pos3 test(Scanner other) {
+            for (int i = 0; i < beacons.size(); i++) {
+                for (int j = 0; j < other.beacons.size(); j++) {
+                    var mine = beacons.get(i);
+                    var their = other.beacons.get(j);
+                    var relx = their.x - mine.x;
+                    var rely = their.y - mine.y;
+                    var relz = their.z - mine.z;
+                    int count = 0;
+                    for (int k = 0; k < beacons.size(); k++) {
+                        if ((count + beacons.size() - k) < 12) break; // not possible
+                        for (int l = 0; l < other.beacons.size(); l++) {
+                            var m = beacons.get(k);
+                            var n = other.beacons.get(l);
+                            if ((relx + m.x) == n.x && (rely + m.y) == n.y && (relz + m.z) == n.z) {
+                                count++;
+                                if (count >= 12) return new Pos3(relx, rely, relz);
+                                break;
+                            }
                         }
                     }
                 }
-                if (count >= 12) {
-                    System.out.printf("FOUND with rel %d %d %d , ", relX, relY, relZ);
-                    System.out.printf("alignment %d %b %b %b%n", a.rot, a.dirx, a.diry, a.dirz);
-
-                    for (int l = 0; l < a.getCount(); l++) {
-                        var n = a.get(l);
-                        n.x -= relX;
-                        n.y -= relY;
-                        n.z -= relZ;
-                        if (!pos.contains(n)) pos.add(n);
-                    }
-
-                    return new Pos3(relX, relY, relZ);
-                }
-            }
-
-            return null;
-        }
-
-        private boolean canMatch(Scanner other) {
-            Set<Pos3> rels = new HashSet<>();
-            for (int i = 0; i < pos.size(); i++) {
-                for (int j = 0; j < other.pos.size(); j++) {
-                    // REL
-                    var mine = pos.get(i);
-                    var their = other.pos.get(j);
-                    rels.add(new Pos3(their.x - mine.x, their.y - mine.y, their.z - mine.z));
-                }
-            }
-            for (var rel : rels) {
-                int relX = rel.x;
-                int relY = rel.y;
-                int relZ = rel.z;
-
-                int count = 0;
-                for (int k = 0; k < pos.size(); k++) {
-                    for (int l = 0; l < other.pos.size(); l++) {
-                        var m = pos.get(k);
-                        var n = other.pos.get(l);
-                        if (relX + m.x == n.x &&
-                                relY + m.y == n.y &&
-                                relZ + m.z == n.z) {
-                            count++;
-                            break;
-                        }
-                    }
-                }
-                if (count >= 12) return true;
-            }
-            return false;
-        }
-
-        public Scanner test(Scanner other) {
-            Scanner sc;
-
-            for (int i = 0; i < 6; i++) {
-                sc = new Scanner(other, i, false, false, false);
-                if (canMatch(sc)) return sc;
-                sc = new Scanner(other, i, false, false, true);
-                if (canMatch(sc)) return sc;
-                sc = new Scanner(other, i, false, true, false);
-                if (canMatch(sc)) return sc;
-                sc = new Scanner(other, i, false, true, true);
-                if (canMatch(sc)) return sc;
-                sc = new Scanner(other, i, true, false, false);
-                if (canMatch(sc)) return sc;
-                sc = new Scanner(other, i, true, false, true);
-                if (canMatch(sc)) return sc;
-                sc = new Scanner(other, i, true, true, false);
-                if (canMatch(sc)) return sc;
-                sc = new Scanner(other, i, true, true, true);
-                if (canMatch(sc)) return sc;
-            }
-
-            return null;
-        }
-
-        public Pos3 extend(Scanner other) {
-            // try to match scanners 0 and 1
-            Pos3 res;
-            for (int i = 0; i < 6; i++) {
-                res = match(new Align(other, i, false, false, false));
-                if (res != null) return res;
-                res = match(new Align(other, i, false, false, true));
-                if (res != null) return res;
-                res = match(new Align(other, i, false, true, false));
-                if (res != null) return res;
-                res = match(new Align(other, i, false, true, true));
-                if (res != null) return res;
-                res = match(new Align(other, i, true, false, false));
-                if (res != null) return res;
-                res = match(new Align(other, i, true, false, true));
-                if (res != null) return res;
-                res = match(new Align(other, i, true, true, false));
-                if (res != null) return res;
-                res = match(new Align(other, i, true, true, true));
-                if (res != null) return res;
             }
             return null;
         }
 
-        @Override
-        public String toString() {
-            var sb = new StringBuilder();
-            for (var p : pos) {
-                sb.append(String.format("%d,%d,%d%n", p.x, p.y, p.z));
+        /**
+         * Try to match the given scanner (for all orientations) with our beacons
+         */
+        public Pair<Scanner, Pos3> match(ScannerOrientation other) {
+            for (int i = 0; i < other.variations.length; i++) {
+                var sc = other.variations[i];
+                var mat = test(sc);
+                if (mat != null) return Pair.of(sc, mat);
             }
-            return sb.toString();
+            return null;
+        }
+
+        /**
+         * Add all unique beacons from the other scanner (with relative position) to our beacon list
+         */
+        public void add(Scanner other, Pos3 relPos) {
+            for (int l = 0; l < other.beacons.size(); l++) {
+                var n = other.beacons.get(l);
+                n = new Pos3(n.x - relPos.x, n.y - relPos.y, n.z - relPos.z);
+                if (!beacons.contains(n)) beacons.add(n);
+            }
         }
     }
 
-    @Override
-    protected void part1(String fileContents) throws IOException {
+    /**
+     * Parse the given input into a list of scanner
+     */
+    private List<Scanner> parse(String fileContents) {
         List<Scanner> scanners = new ArrayList<>();
-        Scanner curSc = new Scanner(-1);
+        Scanner curSc = new Scanner();
 
         for (var line : fileContents.split("[\r\n]+")) {
             if (line.startsWith("---")) {
                 // new scanner
-                curSc = new Scanner(Integer.parseInt(line.split(" ")[2]));
+                assert Integer.parseInt(line.split(" ")[2]) == scanners.size();
+                curSc = new Scanner();
                 scanners.add(curSc);
             } else {
                 var a = Arrays.stream(line.split(",")).mapToInt(Integer::parseInt).toArray();
-                curSc.pos.add(new Pos3(a[0], a[1], a[2]));
+                curSc.beacons.add(new Pos3(a[0], a[1], a[2]));
             }
         }
 
-        // first find pairs
-        Map<Scanner, List<Scanner>> pairs = new HashMap<>();
-        for (var sc : scanners) pairs.put(sc, new ArrayList<>());
-        for (int i = 0, scannersSize = scanners.size(); i < scannersSize; i++) {
-            Scanner sc1 = scanners.get(i);
-            for (int j = i+1, size = scanners.size(); j < size; j++) {
-                Scanner sc2 = scanners.get(j);
-                if (sc1.test(sc2) != null) {
-                    System.out.printf("Match between %d and %d%n", sc1.n, sc2.n);
-                    pairs.get(sc1).add(sc2);
-                    pairs.get(sc2).add(sc1);
-                }
-            }
-        }
+        return scanners;
+    }
 
-        Set<Scanner> remain = new HashSet<>(scanners);
-        Queue<Scanner> frontier = new ArrayDeque<>();
-        frontier.add(scanners.get(0));
+    /**
+     * Given a list of scanners, produce a list of scanner-orientations
+     */
+    private List<ScannerOrientation> orientations(List<Scanner> scanners) {
+        List<ScannerOrientation> result = new ArrayList<>();
+        for (var s : scanners) result.add(new ScannerOrientation(s));
+        return result;
+    }
 
-        List<Pos3> locs = new ArrayList<>();
+    @Override
+    protected void part1(String fileContents) {
+        var scanners = orientations(parse(fileContents)).toArray(ScannerOrientation[]::new);
+        var orientation = new Scanner[scanners.length];
+        var position = new Pos3[scanners.length];
 
-        Scanner result = scanners.get(0);
+        orientation[0] = scanners[0].get(0, 0);
+        position[0] = new Pos3(0,0,0);
+
+        Queue<Integer> frontier = new ArrayDeque<>();
+        frontier.add(0);
+
         while (!frontier.isEmpty()) {
-            var o = frontier.poll();
-            for (var s : pairs.get(o)) {
-                if (!remain.contains(s)) continue;
-
-                var res = result.extend(s);
-                if (res != null) {
-                    remain.remove(s);
-                    frontier.add(s);
-                    locs.add(res);
-                    System.out.printf("%d remain!%n", remain.size());
-                } else {
-                    System.out.println("BAD");
+            var front = frontier.poll();
+            for (int i = 0; i < scanners.length; i++) {
+                if (position[i] == null) {
+                    var match = orientation[front].match(scanners[i]);
+                    if (match != null) {
+                        orientation[i] = match.a; // correct orientation!
+                        position[i] = new Pos3(position[front], match.b);
+                        frontier.add(i);
+                    }
                 }
             }
         }
 
-        System.out.println("Part 1: " + result.pos.size());
+        var result = new Scanner(orientation[0]);
+        for (int i = 1; i < scanners.length; i++) {
+            result.add(orientation[i], position[i]);
+        }
 
         int maxDist = Integer.MIN_VALUE;
-        for (int i = 0; i < locs.size(); i++) {
-            for (int j = 0; j < locs.size(); j++) {
-                var one = locs.get(i);
-                var two = locs.get(j);
+        for (int i = 0; i < position.length; i++) {
+            for (int j = 0; j < position.length; j++) {
+                var one = position[i];
+                var two = position[j];
                 var d = Math.abs(one.x-two.x) + Math.abs(one.y-two.y) + Math.abs(one.z-two.z);
                 maxDist = Math.max(maxDist, d);
             }
         }
 
+        System.out.println("Part 1: " + result.beacons.size());
         System.out.println("Part 2: " + maxDist);
     }
 
     @Override
-    protected void part2(String fileContents) throws IOException {
+    protected void part2(String fileContents) {
+        // Actually we did part 2 in part 1...
     }
 
     public static void main(String[] args) {
