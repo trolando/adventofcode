@@ -9,7 +9,6 @@ public class Day20 extends Day {
     String alg;
 
     private class Enhanced {
-        final Enhanced src;
         final boolean inverse;
         final Set<Pair<Integer,Integer>> pixels;
         final Pair<Integer,Integer> xbounds;
@@ -30,11 +29,9 @@ public class Day20 extends Day {
             xbounds = Pair.of(xmin, xmax+1);
             ybounds = Pair.of(ymin, ymax+1);
             inverse = false;
-            src = null;
         }
 
         public Enhanced(Enhanced src) {
-            this.src = src;
             this.pixels = new HashSet<>();
             this.xbounds = Pair.of(src.xbounds.a-1, src.xbounds.b+1);
             this.ybounds = Pair.of(src.ybounds.a-1, src.ybounds.b+1);
@@ -43,7 +40,7 @@ public class Day20 extends Day {
                 for (int x = xbounds.a; x < xbounds.b; x++) {
                     for (int y = ybounds.a; y < ybounds.b; y++) {
                         var p = Pair.of(x, y);
-                        var r = compute(p);
+                        var r = compute(src, p);
                         if (r != inverse) pixels.add(p);
                     }
                 }
@@ -52,7 +49,7 @@ public class Day20 extends Day {
                 for (int x = xbounds.a; x < xbounds.b; x++) {
                     for (int y = ybounds.a; y < ybounds.b; y++) {
                         var p = Pair.of(x, y);
-                        if (compute(p)) pixels.add(p);
+                        if (compute(src, p)) pixels.add(p);
                     }
                 }
             }
@@ -64,7 +61,7 @@ public class Day20 extends Day {
             return inverse != r;
         }
 
-        private boolean compute(Pair<Integer,Integer> p) {
+        private boolean compute(Enhanced src, Pair<Integer,Integer> p) {
             int x = p.a;
             int y = p.b;
             int r = 0;

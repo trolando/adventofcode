@@ -5,20 +5,6 @@ import nl.tvandijk.aoc.common.Day;
 import java.util.*;
 
 public class Day19 extends Day {
-    private static class Pair <A, B> {
-        A a;
-        B b;
-
-        public Pair(A a, B b) {
-            this.a = a;
-            this.b = b;
-        }
-
-        public static <A, B> Pair<A, B> of(A a, B b){
-            return new Pair<>(a, b);
-        }
-    }
-
     private static class Pos3 {
         int x;
         int y;
@@ -36,23 +22,21 @@ public class Day19 extends Day {
 
         public Pos3 up(int up) {
             return switch (up) {
-                case 0 -> this;
                 case 1 -> new Pos3(x, -y, -z);
                 case 2 -> new Pos3(x, -z, y);
                 case 3 -> new Pos3(-y, -z, x);
                 case 4 -> new Pos3(-x, -z, -y);
                 case 5 -> new Pos3(y, -z, -x);
-                default -> null;
+                default -> this;
             };
         }
 
         public Pos3 rot(int rot) {
             return switch (rot) {
-                case 0 -> this;
                 case 1 -> new Pos3(-y, x, z);
                 case 2 -> new Pos3(-x, -y, z);
                 case 3 -> new Pos3(y, -x, z);
-                default -> null;
+                default -> this;
             };
         }
 
@@ -150,7 +134,7 @@ public class Day19 extends Day {
         }
 
         private Pos3 test(Scanner other) {
-            for (int i = 0; i < beacons.size(); i++) {
+            for (int i = 11; i < beacons.size(); i++) {
                 for (int j = 0; j < other.beacons.size(); j++) {
                     var mine = beacons.get(i);
                     var their = other.beacons.get(j);
@@ -265,7 +249,7 @@ public class Day19 extends Day {
 
         int maxDist = Integer.MIN_VALUE;
         for (int i = 0; i < position.length; i++) {
-            for (int j = 0; j < position.length; j++) {
+            for (int j = i+1; j < position.length; j++) {
                 var one = position[i];
                 var two = position[j];
                 var d = Math.abs(one.x-two.x) + Math.abs(one.y-two.y) + Math.abs(one.z-two.z);
