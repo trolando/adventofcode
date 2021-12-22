@@ -151,8 +151,8 @@ public class Day21 extends Day {
 
     @Override
     protected void part1(String fileContents) {
-        part1loop(4,8);
-        part1loop(8,6);
+        part1loop(4, 8);
+        part1loop(8, 6);
     }
 
     @Override
