@@ -1,11 +1,14 @@
 package nl.tvandijk.aoc.year2021.day23;
 
 import nl.tvandijk.aoc.common.Day;
+import nl.tvandijk.aoc.common.GenericTransitionSystem;
+import nl.tvandijk.aoc.common.Pair;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 public class Day23 extends Day {
+    private final static boolean PRINTPATH = false;
+    private final static boolean COUNTALL = false;
 
     // #############
     // #01234567890#  0 to 11
@@ -13,8 +16,9 @@ public class Day23 extends Day {
     //   #A#B#C#D#   11 13 15 17
     //   #########
 
-    private static class State {
-        int[] places;
+    private static final class State {
+        final int[] places;
+        private static final long[] baseCost = {0, 1, 10, 100, 1000};
 
         public State(int[] places) {
             this.places = Arrays.copyOf(places, places.length);
@@ -30,14 +34,6 @@ public class Day23 extends Day {
          * Check if the way is clear
          */
         private boolean wayClear(int from, int to) {
-            /*
-             #############
-             #01234567890#  0 to 11
-             ###A#B#C#D### 12 14 16 18
-               #A#B#C#D#   13 15 17 19
-               #########
-            */
-
             if (from == to) return true;
 
             switch(from) {
@@ -83,31 +79,32 @@ public class Day23 extends Day {
             }
         }
 
-        static long[] basePrice = {0, 1, 10, 100, 1000};
-
-        public long price(int token, int from, int to) {
-            var b = basePrice[token];
+        public long dist(int from, int to) {
             return switch (from) {
-                case 12 -> b + price(token, 2, to);
-                case 13 -> 2 * b + price(token, 2, to);
-                case 14 -> b + price(token, 4, to);
-                case 15 -> 2 * b + price(token, 4, to);
-                case 16 -> b + price(token, 6, to);
-                case 17 -> 2 * b + price(token, 6, to);
-                case 18 -> b + price(token, 8, to);
-                case 19 -> 2 * b + price(token, 8, to);
+                case 12 -> 1 + dist(2, to);
+                case 13 -> 2 + dist(2, to);
+                case 14 -> 1 + dist(4, to);
+                case 15 -> 2 + dist(4, to);
+                case 16 -> 1 + dist(6, to);
+                case 17 -> 2 + dist(6, to);
+                case 18 -> 1 + dist(8, to);
+                case 19 -> 2 + dist(8, to);
                 default -> switch (to) {
-                    case 12 -> b + price(token, from, 2);
-                    case 13 -> 2 * b + price(token, from, 2);
-                    case 14 -> b + price(token, from, 4);
-                    case 15 -> 2 * b + price(token, from, 4);
-                    case 16 -> b + price(token, from, 6);
-                    case 17 -> 2 * b + price(token, from, 6);
-                    case 18 -> b + price(token, from, 8);
-                    case 19 -> 2 * b + price(token, from, 8);
-                    default -> b * Math.abs(from - to);
+                    case 12 -> 1 + dist(from, 2);
+                    case 13 -> 2 + dist(from, 2);
+                    case 14 -> 1 + dist(from, 4);
+                    case 15 -> 2 + dist(from, 4);
+                    case 16 -> 1 + dist(from, 6);
+                    case 17 -> 2 + dist(from, 6);
+                    case 18 -> 1 + dist(from, 8);
+                    case 19 -> 2 + dist(from, 8);
+                    default -> Math.abs(from - to);
                 };
             };
+        }
+
+        public long cost(int token, int from, int to) {
+            return baseCost[token] * dist(from, to);
         }
 
         public List<Pair<State, Long>> successors() {
@@ -118,17 +115,15 @@ public class Day23 extends Day {
             // only move from 12-19 to 0-11
 
             for (int i = 0; i < 11; i++) {
-                if (places[i] == 0) {
-                    // continue
-                } else if (places[i] == 1) {
+                if (places[i] == 1) {
                     // move A
                     if (places[12] == 0) {
                         if (places[13] == 1) {
                             if (wayClear(i, 2)) {
-                                res.add(Pair.of(new State(this, i, 12), price(1, i, 12)));
+                                res.add(Pair.of(new State(this, i, 12), cost(1, i, 12)));
                             }
                         } else if (places[13] == 0 && wayClear(i, 2)) {
-                            res.add(Pair.of(new State(this, i, 13), price(1, i, 13)));
+                            res.add(Pair.of(new State(this, i, 13), cost(1, i, 13)));
                         }
                     }
                 } else if (places[i] == 2) {
@@ -136,10 +131,10 @@ public class Day23 extends Day {
                     if (places[14] == 0) {
                         if (places[15] == 2) {
                             if (wayClear(i, 4)) {
-                                res.add(Pair.of(new State(this, i, 14), price(2, i, 14)));
+                                res.add(Pair.of(new State(this, i, 14), cost(2, i, 14)));
                             }
                         } else if (places[15] == 0 && wayClear(i, 4)) {
-                            res.add(Pair.of(new State(this, i, 15), price(2, i, 15)));
+                            res.add(Pair.of(new State(this, i, 15), cost(2, i, 15)));
                         }
                     }
                 } else if (places[i] == 3) {
@@ -147,10 +142,10 @@ public class Day23 extends Day {
                     if (places[16] == 0) {
                         if (places[17] == 3) {
                             if (wayClear(i, 6)) {
-                                res.add(Pair.of(new State(this, i, 16), price(3, i, 16)));
+                                res.add(Pair.of(new State(this, i, 16), cost(3, i, 16)));
                             }
                         } else if (places[17] == 0 && wayClear(i, 6)) {
-                            res.add(Pair.of(new State(this, i, 17), price(3, i, 17)));
+                            res.add(Pair.of(new State(this, i, 17), cost(3, i, 17)));
                         }
                     }
                 } else if (places[i] == 4) {
@@ -158,10 +153,10 @@ public class Day23 extends Day {
                     if (places[18] == 0) {
                         if (places[19] == 4) {
                             if (wayClear(i, 8)) {
-                                res.add(Pair.of(new State(this, i, 18), price(4, i, 18)));
+                                res.add(Pair.of(new State(this, i, 18), cost(4, i, 18)));
                             }
                         } else if (places[19] == 0 && wayClear(i, 8)) {
-                            res.add(Pair.of(new State(this, i, 19), price(4, i, 19)));
+                            res.add(Pair.of(new State(this, i, 19), cost(4, i, 19)));
                         }
                     }
                 }
@@ -175,28 +170,28 @@ public class Day23 extends Day {
                 if (places[j] != 0) continue; // unoccupied?
 
                 if (places[12] != 0 && places[2] == 0 && wayClear(2, j)) {
-                    res.add(Pair.of(new State(this, 12, j), price(places[12], 12, j)));
+                    res.add(Pair.of(new State(this, 12, j), cost(places[12], 12, j)));
                 }
                 if (places[13] != 0 && places[12] == 0 && places[2] == 0 && wayClear(2, j)) {
-                    res.add(Pair.of(new State(this, 13, j), price(places[13], 13, j)));
+                    res.add(Pair.of(new State(this, 13, j), cost(places[13], 13, j)));
                 }
                 if (places[14] != 0 && places[4] == 0 && wayClear(4, j)) {
-                    res.add(Pair.of(new State(this, 14, j), price(places[14], 14, j)));
+                    res.add(Pair.of(new State(this, 14, j), cost(places[14], 14, j)));
                 }
                 if (places[15] != 0 && places[14] == 0 && places[4] == 0 && wayClear(4, j)) {
-                    res.add(Pair.of(new State(this, 15, j), price(places[15], 15, j)));
+                    res.add(Pair.of(new State(this, 15, j), cost(places[15], 15, j)));
                 }
                 if (places[16] != 0 && places[6] == 0 && wayClear(6, j)) {
-                    res.add(Pair.of(new State(this, 16, j), price(places[16], 16, j)));
+                    res.add(Pair.of(new State(this, 16, j), cost(places[16], 16, j)));
                 }
                 if (places[17] != 0 && places[16] == 0 && places[6] == 0 && wayClear(6, j)) {
-                    res.add(Pair.of(new State(this, 17, j), price(places[17], 17, j)));
+                    res.add(Pair.of(new State(this, 17, j), cost(places[17], 17, j)));
                 }
                 if (places[18] != 0 && places[8] == 0 && wayClear(8, j)) {
-                    res.add(Pair.of(new State(this, 18, j), price(places[18], 18, j)));
+                    res.add(Pair.of(new State(this, 18, j), cost(places[18], 18, j)));
                 }
                 if (places[19] != 0 && places[18] == 0 && places[8] == 0 && wayClear(8, j)) {
-                    res.add(Pair.of(new State(this, 19, j), price(places[19], 19, j)));
+                    res.add(Pair.of(new State(this, 19, j), cost(places[19], 19, j)));
                 }
             }
             return res;
@@ -282,41 +277,31 @@ public class Day23 extends Day {
         pos[18] = read(lines[2].charAt(9));
         pos[19] = read(lines[3].charAt(9));
 
-        Map<State, Long> distance = new HashMap<>();
-        Map<State, State> pred = new HashMap<>();
-        PriorityQueue<State> unvisited = new PriorityQueue<>(Comparator.comparingLong(distance::get));
-
-        var initial = new State(pos);
-        distance.put(initial, 0L);
-        unvisited.add(initial);
-
-        State finalState = null;
-
-        while (!unvisited.isEmpty()) {
-            var v = unvisited.poll();
-            var dv = distance.get(v);
-            if (v.isFinal()) {
-                finalState = v;
-                break;
+        var ts = new GenericTransitionSystem<State>() {
+            @Override
+            public Collection<State> initial() {
+                return List.of(new State(pos));
             }
 
-            for (var s : v.successors()) {
-                var nv = s.a;
-                var dnv = dv + s.b;
+            @Override
+            public Collection<Pair<State, Long>> successors(State state) {
+                return state.successors();
+            }
 
-                if (distance.containsKey(nv)) {
-                    var cur = distance.get(nv);
-                    if (cur > dnv) {
-                        unvisited.remove(nv);
-                        distance.put(nv, dnv);
-                        unvisited.add(nv);
-                        pred.put(nv, v);
-                    }
-                } else {
-                    distance.put(nv, dnv);
-                    unvisited.add(nv);
-                    pred.put(nv, v);
-                }
+            @Override
+            public boolean isFinal(State state) {
+                return state.isFinal();
+            }
+        };
+
+        var res = ts.reachFinal();
+        System.out.println("Part 1: " + res.a.get(res.b.get(res.b.size()-1)));
+
+        if (PRINTPATH) {
+            var distance = res.a;
+            for (var state : res.b) {
+                System.out.printf("At distance %d:%n", distance.get(state));
+                System.out.println(state.draw());
             }
         }
 
@@ -328,24 +313,6 @@ public class Day23 extends Day {
 //        test(distance, new State(new int[]{0,0,0,0,0,4,0,4,0,1,0,0,0,1,2,2,3,3,0,0}));
 //        test(distance, new State(new int[]{0,0,0,0,0,0,0,0,0,1,0,0,0,1,2,2,3,3,4,4}));
 //        test(distance, new State(new int[]{0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,2,3,3,4,4}));
-
-        var states = new ArrayList<>(distance.entrySet());
-        states.sort(Comparator.comparingLong(Map.Entry::getValue));
-
-        List<State> trace = new ArrayList<>();
-        {
-            var s = finalState;
-            while (s != null) {
-                trace.add(0, s);
-                s = pred.get(s);
-            }
-        }
-        for (var state : trace) {
-            System.out.printf("At distance %d:%n", distance.get(state));
-            System.out.println(state.draw());
-        }
-
-        System.out.println("Part 1: " + distance.get(finalState));
     }
 
     private void test(Map<State, Long> distance, State state) {
@@ -357,8 +324,19 @@ public class Day23 extends Day {
         }
     }
 
-    private static class State2 {
-        int[] places;
+    private static final class State2 {
+        /*
+         #############
+         #01234567890# 0 .. 10
+         ###A#B#C#D### 12 16 20 24
+           #A#B#C#D#   13 17 21 25
+           #A#B#C#D#   14 18 22 26
+           #A#B#C#D#   15 19 23 27
+           #########
+        */
+
+        final int[] places;
+        final static long[] baseCost = {0, 1, 10, 100, 1000};
 
         public State2(int[] places) {
             this.places = Arrays.copyOf(places, places.length);
@@ -374,16 +352,6 @@ public class Day23 extends Day {
          * Check if the way is clear
          */
         private boolean wayClear(int from, int to) {
-            /*
-             #############
-             #01234567890# 0 .. 10
-             ###A#B#C#D### 12 16 20 24
-               #A#B#C#D#   13 17 21 25
-               #A#B#C#D#   14 18 22 26
-               #A#B#C#D#   15 19 23 27
-               #########
-            */
-
             if (from == to) return true;
 
             switch(from) {
@@ -453,45 +421,45 @@ public class Day23 extends Day {
             }
         }
 
-        static long[] basePrice = {0, 1, 10, 100, 1000};
-
-        public long price(int token, int from, int to) {
-            var b = basePrice[token];
+        public long cost(int token, int from, int to) {
+            return baseCost[token] * dist(from, to);
+        }
+        public long dist(int from, int to) {
             return switch (from) {
-                case 12 -> b + price(token, 2, to);
-                case 13 -> 2 * b + price(token, 2, to);
-                case 14 -> 3 * b + price(token, 2, to);
-                case 15 -> 4 * b + price(token, 2, to);
-                case 16 -> b + price(token, 4, to);
-                case 17 -> 2 * b + price(token, 4, to);
-                case 18 -> 3 * b + price(token, 4, to);
-                case 19 -> 4 * b + price(token, 4, to);
-                case 20 -> b + price(token, 6, to);
-                case 21 -> 2 * b + price(token, 6, to);
-                case 22 -> 3 * b + price(token, 6, to);
-                case 23 -> 4 * b + price(token, 6, to);
-                case 24 -> b + price(token, 8, to);
-                case 25 -> 2 * b + price(token, 8, to);
-                case 26 -> 3 * b + price(token, 8, to);
-                case 27 -> 4 * b + price(token, 8, to);
+                case 12 -> 1 + dist(2, to);
+                case 13 -> 2 + dist(2, to);
+                case 14 -> 3 + dist(2, to);
+                case 15 -> 4 + dist(2, to);
+                case 16 -> 1 + dist(4, to);
+                case 17 -> 2 + dist(4, to);
+                case 18 -> 3 + dist(4, to);
+                case 19 -> 4 + dist(4, to);
+                case 20 -> 1 + dist(6, to);
+                case 21 -> 2 + dist(6, to);
+                case 22 -> 3 + dist(6, to);
+                case 23 -> 4 + dist(6, to);
+                case 24 -> 1 + dist(8, to);
+                case 25 -> 2 + dist(8, to);
+                case 26 -> 3 + dist(8, to);
+                case 27 -> 4 + dist(8, to);
                 default -> switch (to) {
-                    case 12 -> b + price(token, from, 2);
-                    case 13 -> 2 * b + price(token, from, 2);
-                    case 14 -> 3 * b + price(token, from, 2);
-                    case 15 -> 4 * b + price(token, from, 2);
-                    case 16 -> b + price(token, from, 4);
-                    case 17 -> 2 * b + price(token, from, 4);
-                    case 18 -> 3 * b + price(token, from, 4);
-                    case 19 -> 4 * b + price(token, from, 4);
-                    case 20 -> b + price(token, from, 6);
-                    case 21 -> 2 * b + price(token, from, 6);
-                    case 22 -> 3 * b + price(token, from, 6);
-                    case 23 -> 4 * b + price(token, from, 6);
-                    case 24 -> b + price(token, from, 8);
-                    case 25 -> 2 * b + price(token, from, 8);
-                    case 26 -> 3 * b + price(token, from, 8);
-                    case 27 -> 4 * b + price(token, from, 8);
-                    default -> b * Math.abs(from - to);
+                    case 12 -> 1 + dist(from, 2);
+                    case 13 -> 2 + dist(from, 2);
+                    case 14 -> 3 + dist(from, 2);
+                    case 15 -> 4 + dist(from, 2);
+                    case 16 -> 1 + dist(from, 4);
+                    case 17 -> 2 + dist(from, 4);
+                    case 18 -> 3 + dist(from, 4);
+                    case 19 -> 4 + dist(from, 4);
+                    case 20 -> 1 + dist(from, 6);
+                    case 21 -> 2 + dist(from, 6);
+                    case 22 -> 3 + dist(from, 6);
+                    case 23 -> 4 + dist(from, 6);
+                    case 24 -> 1 + dist(from, 8);
+                    case 25 -> 2 + dist(from, 8);
+                    case 26 -> 3 + dist(from, 8);
+                    case 27 -> 4 + dist(from, 8);
+                    default -> Math.abs(from - to);
                 };
             };
         }
@@ -509,58 +477,58 @@ public class Day23 extends Day {
                 } else if (places[i] == 1) {
                     // move A
                     if (places[12] == 0 && places[13] == 1 && places[14] == 1 && places[15] == 1 && wayClear(i, 2)) {
-                        res.add(Pair.of(new State2(this, i, 12), price(1, i, 12)));
+                        res.add(Pair.of(new State2(this, i, 12), cost(1, i, 12)));
                     }
                     if (places[12] == 0 && places[13] == 0 && places[14] == 1 && places[15] == 1 && wayClear(i, 2)) {
-                        res.add(Pair.of(new State2(this, i, 13), price(1, i, 13)));
+                        res.add(Pair.of(new State2(this, i, 13), cost(1, i, 13)));
                     }
                     if (places[12] == 0 && places[13] == 0 && places[14] == 0 && places[15] == 1 && wayClear(i, 2)) {
-                        res.add(Pair.of(new State2(this, i, 14), price(1, i, 14)));
+                        res.add(Pair.of(new State2(this, i, 14), cost(1, i, 14)));
                     }
                     if (places[12] == 0 && places[13] == 0 && places[14] == 0 && places[15] == 0 && wayClear(i, 2)) {
-                        res.add(Pair.of(new State2(this, i, 15), price(1, i, 15)));
+                        res.add(Pair.of(new State2(this, i, 15), cost(1, i, 15)));
                     }
                 } else if (places[i] == 2) {
                     // move B
                     if (places[16] == 0 && places[17] == 2 && places[18] == 2 && places[19] == 2 && wayClear(i, 4)) {
-                        res.add(Pair.of(new State2(this, i, 16), price(2, i, 16)));
+                        res.add(Pair.of(new State2(this, i, 16), cost(2, i, 16)));
                     }
                     if (places[16] == 0 && places[17] == 0 && places[18] == 2 && places[19] == 2 && wayClear(i, 4)) {
-                        res.add(Pair.of(new State2(this, i, 17), price(2, i, 17)));
+                        res.add(Pair.of(new State2(this, i, 17), cost(2, i, 17)));
                     }
                     if (places[16] == 0 && places[17] == 0 && places[18] == 0 && places[19] == 2 && wayClear(i, 4)) {
-                        res.add(Pair.of(new State2(this, i, 18), price(2, i, 18)));
+                        res.add(Pair.of(new State2(this, i, 18), cost(2, i, 18)));
                     }
                     if (places[16] == 0 && places[17] == 0 && places[18] == 0 && places[19] == 0 && wayClear(i, 4)) {
-                        res.add(Pair.of(new State2(this, i, 19), price(2, i, 19)));
+                        res.add(Pair.of(new State2(this, i, 19), cost(2, i, 19)));
                     }
                 } else if (places[i] == 3) {
                     // move C
                     if (places[20] == 0 && places[21] == 3 && places[22] == 3 && places[23] == 3 && wayClear(i, 6)) {
-                        res.add(Pair.of(new State2(this, i, 20), price(3, i, 20)));
+                        res.add(Pair.of(new State2(this, i, 20), cost(3, i, 20)));
                     }
                     if (places[20] == 0 && places[21] == 0 && places[22] == 3 && places[23] == 3 && wayClear(i, 6)) {
-                        res.add(Pair.of(new State2(this, i, 21), price(3, i, 21)));
+                        res.add(Pair.of(new State2(this, i, 21), cost(3, i, 21)));
                     }
                     if (places[20] == 0 && places[21] == 0 && places[22] == 0 && places[23] == 3 && wayClear(i, 6)) {
-                        res.add(Pair.of(new State2(this, i, 22), price(3, i, 22)));
+                        res.add(Pair.of(new State2(this, i, 22), cost(3, i, 22)));
                     }
                     if (places[20] == 0 && places[21] == 0 && places[22] == 0 && places[23] == 0 && wayClear(i, 6)) {
-                        res.add(Pair.of(new State2(this, i, 23), price(3, i, 23)));
+                        res.add(Pair.of(new State2(this, i, 23), cost(3, i, 23)));
                     }
                 } else if (places[i] == 4) {
                     // move D
                     if (places[24] == 0 && places[25] == 4 && places[26] == 4 && places[27] == 4 && wayClear(i, 8)) {
-                        res.add(Pair.of(new State2(this, i, 24), price(4, i, 24)));
+                        res.add(Pair.of(new State2(this, i, 24), cost(4, i, 24)));
                     }
                     if (places[24] == 0 && places[25] == 0 && places[26] == 4 && places[27] == 4 && wayClear(i, 8)) {
-                        res.add(Pair.of(new State2(this, i, 25), price(4, i, 25)));
+                        res.add(Pair.of(new State2(this, i, 25), cost(4, i, 25)));
                     }
                     if (places[24] == 0 && places[25] == 0 && places[26] == 0 && places[27] == 4 && wayClear(i, 8)) {
-                        res.add(Pair.of(new State2(this, i, 26), price(4, i, 26)));
+                        res.add(Pair.of(new State2(this, i, 26), cost(4, i, 26)));
                     }
                     if (places[24] == 0 && places[25] == 0 && places[26] == 0 && places[27] == 0 && wayClear(i, 8)) {
-                        res.add(Pair.of(new State2(this, i, 27), price(4, i, 27)));
+                        res.add(Pair.of(new State2(this, i, 27), cost(4, i, 27)));
                     }
                 }
             }
@@ -573,55 +541,55 @@ public class Day23 extends Day {
                 if (places[j] != 0) continue; // unoccupied?
 
                 if (places[12] != 0 && places[2] == 0 && wayClear(2, j)) {
-                    res.add(Pair.of(new State2(this, 12, j), price(places[12], 12, j)));
+                    res.add(Pair.of(new State2(this, 12, j), cost(places[12], 12, j)));
                 }
                 if (places[13] != 0 && places[12] == 0 && places[2] == 0 && wayClear(2, j)) {
-                    res.add(Pair.of(new State2(this, 13, j), price(places[13], 13, j)));
+                    res.add(Pair.of(new State2(this, 13, j), cost(places[13], 13, j)));
                 }
                 if (places[14] != 0 && places[13] == 0 && places[12] == 0 && places[2] == 0 && wayClear(2, j)) {
-                    res.add(Pair.of(new State2(this, 14, j), price(places[14], 14, j)));
+                    res.add(Pair.of(new State2(this, 14, j), cost(places[14], 14, j)));
                 }
                 if (places[15] != 0 && places[14] == 0 && places[13] == 0 && places[12] == 0 && places[2] == 0 && wayClear(2, j)) {
-                    res.add(Pair.of(new State2(this, 15, j), price(places[15], 15, j)));
+                    res.add(Pair.of(new State2(this, 15, j), cost(places[15], 15, j)));
                 }
 
                 if (places[16] != 0 && places[4] == 0 && wayClear(4, j)) {
-                    res.add(Pair.of(new State2(this, 16, j), price(places[16], 16, j)));
+                    res.add(Pair.of(new State2(this, 16, j), cost(places[16], 16, j)));
                 }
                 if (places[17] != 0 && places[16] == 0 && places[4] == 0 && wayClear(4, j)) {
-                    res.add(Pair.of(new State2(this, 17, j), price(places[17], 17, j)));
+                    res.add(Pair.of(new State2(this, 17, j), cost(places[17], 17, j)));
                 }
                 if (places[18] != 0 && places[17] == 0 && places[16] == 0 && places[4] == 0 && wayClear(4, j)) {
-                    res.add(Pair.of(new State2(this, 18, j), price(places[18], 18, j)));
+                    res.add(Pair.of(new State2(this, 18, j), cost(places[18], 18, j)));
                 }
                 if (places[19] != 0 && places[18] == 0 && places[17] == 0 && places[16] == 0 && places[4] == 0 && wayClear(4, j)) {
-                    res.add(Pair.of(new State2(this, 19, j), price(places[19], 19, j)));
+                    res.add(Pair.of(new State2(this, 19, j), cost(places[19], 19, j)));
                 }
 
                 if (places[20] != 0 && places[6] == 0 && wayClear(6, j)) {
-                    res.add(Pair.of(new State2(this, 20, j), price(places[20], 20, j)));
+                    res.add(Pair.of(new State2(this, 20, j), cost(places[20], 20, j)));
                 }
                 if (places[21] != 0 && places[20] == 0 && places[6] == 0 && wayClear(6, j)) {
-                    res.add(Pair.of(new State2(this, 21, j), price(places[21], 21, j)));
+                    res.add(Pair.of(new State2(this, 21, j), cost(places[21], 21, j)));
                 }
                 if (places[22] != 0 && places[21] == 0 && places[20] == 0 && places[6] == 0 && wayClear(6, j)) {
-                    res.add(Pair.of(new State2(this, 22, j), price(places[22], 22, j)));
+                    res.add(Pair.of(new State2(this, 22, j), cost(places[22], 22, j)));
                 }
                 if (places[23] != 0 && places[22] == 0 && places[21] == 0 && places[20] == 0 && places[6] == 0 && wayClear(6, j)) {
-                    res.add(Pair.of(new State2(this, 23, j), price(places[23], 23, j)));
+                    res.add(Pair.of(new State2(this, 23, j), cost(places[23], 23, j)));
                 }
 
                 if (places[24] != 0 && places[8] == 0 && wayClear(8, j)) {
-                    res.add(Pair.of(new State2(this, 24, j), price(places[24], 24, j)));
+                    res.add(Pair.of(new State2(this, 24, j), cost(places[24], 24, j)));
                 }
                 if (places[25] != 0 && places[24] == 0 && places[8] == 0 && wayClear(8, j)) {
-                    res.add(Pair.of(new State2(this, 25, j), price(places[25], 25, j)));
+                    res.add(Pair.of(new State2(this, 25, j), cost(places[25], 25, j)));
                 }
                 if (places[26] != 0 && places[25] == 0 && places[24] == 0 && places[8] == 0 && wayClear(8, j)) {
-                    res.add(Pair.of(new State2(this, 26, j), price(places[26], 26, j)));
+                    res.add(Pair.of(new State2(this, 26, j), cost(places[26], 26, j)));
                 }
                 if (places[27] != 0 && places[26] == 0 && places[25] == 0 && places[24] == 0 && places[8] == 0 && wayClear(8, j)) {
-                    res.add(Pair.of(new State2(this, 27, j), price(places[27], 27, j)));
+                    res.add(Pair.of(new State2(this, 27, j), cost(places[27], 27, j)));
                 }
             }
             return res;
@@ -655,6 +623,54 @@ public class Day23 extends Day {
                     places[24] == 4 && places[25] == 4 &&
                     places[26] == 4 && places[27] == 4;
         }
+
+        public String draw() {
+            // #############
+            // #01234567890#  0 to 11
+            // ###A#B#C#D### 10 12 14 16
+            //   #A#B#C#D#   11 13 15 17
+            //   #########
+
+            var sb = new StringBuilder();
+            sb.append("#############\n");
+            sb.append("#");
+            for (int i = 0; i < 11; i++) sb.append(" ABCD".charAt(places[i]));
+            sb.append("#\n");
+            sb.append("###");
+            sb.append(" ABCD".charAt(places[12]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[16]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[20]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[24]));
+            sb.append("###\n  #");
+            sb.append(" ABCD".charAt(places[13]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[17]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[21]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[23]));
+            sb.append("###\n  #");
+            sb.append(" ABCD".charAt(places[14]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[18]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[22]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[26]));
+            sb.append("###\n  #");
+            sb.append(" ABCD".charAt(places[15]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[19]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[23]));
+            sb.append("#");
+            sb.append(" ABCD".charAt(places[27]));
+            sb.append("###\n  #########\n");
+            return sb.toString();
+        }
     } // class
 
     @Override
@@ -679,54 +695,38 @@ public class Day23 extends Day {
         pos[26] = 3;
         pos[27] = read(lines[3].charAt(9));
 
-        Map<State2, Long> distance = new HashMap<>();
-        Map<State2, State2> pred = new HashMap<>();
-        PriorityQueue<State2> unvisited = new PriorityQueue<>(Comparator.comparingLong(distance::get));
-
-        var initial = new State2(pos);
-        distance.put(initial, 0L);
-        unvisited.add(initial);
-
-        State2 finalState = null;
-
-        while (!unvisited.isEmpty()) {
-            var v = unvisited.poll();
-            var dv = distance.get(v);
-            if (v.isFinal()) {
-                finalState = v;
-                break;
+        var ts = new GenericTransitionSystem<State2>() {
+            @Override
+            public Collection<State2> initial() {
+                return List.of(new State2(pos));
             }
 
-            for (var s : v.successors()) {
-                var nv = s.a;
-                var dnv = dv + s.b;
+            @Override
+            public Collection<Pair<State2, Long>> successors(State2 state) {
+                return state.successors();
+            }
 
-                if (distance.containsKey(nv)) {
-                    var cur = distance.get(nv);
-                    if (cur > dnv) {
-                        unvisited.remove(nv);
-                        distance.put(nv, dnv);
-                        unvisited.add(nv);
-                        pred.put(nv, v);
-                    }
-                } else {
-                    distance.put(nv, dnv);
-                    unvisited.add(nv);
-                    pred.put(nv, v);
-                }
+            @Override
+            public boolean isFinal(State2 state) {
+                return state.isFinal();
+            }
+        };
+
+        var res = ts.reachFinal();
+        System.out.println("Part 2: " + res.a.get(res.b.get(res.b.size()-1)));
+
+        if (PRINTPATH) {
+            var distance = res.a;
+            for (var state : res.b) {
+                System.out.printf("At distance %d:%n", distance.get(state));
+                System.out.println(state.draw());
             }
         }
 
-        var states = new ArrayList<>(distance.entrySet());
-        states.sort(Comparator.comparingLong(Map.Entry::getValue));
-
-//        var s = finalState;
-//        while (s != null) {
-//            System.out.printf("%s distance %d%n", s, distance.get(s));
-//            s = pred.get(s);
-//        }
-
-        System.out.println("Part 2: " + distance.get(finalState));    }
+        if (COUNTALL) {
+            System.out.println("Total number of states: "+ts.reachAll().size());
+        }
+    }
 
     public static void main(String[] args) {
         run(Day23::new, "example.txt", "input.txt");

@@ -1,6 +1,7 @@
 package nl.tvandijk.aoc.year2021.day19;
 
 import nl.tvandijk.aoc.common.Day;
+import nl.tvandijk.aoc.common.Pair;
 
 import java.util.*;
 
