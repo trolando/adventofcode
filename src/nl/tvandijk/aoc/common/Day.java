@@ -29,6 +29,11 @@ public abstract class Day {
         public int hashCode() {
             return Objects.hash(a, b);
         }
+
+        @Override
+        public String toString() {
+            return "<" + a + ", " + b + ">";
+        }
     }
 
     protected void part1(String fileContents) throws Exception {
