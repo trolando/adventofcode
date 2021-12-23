@@ -1,7 +1,7 @@
 package nl.tvandijk.aoc.year2021.day23;
 
 import nl.tvandijk.aoc.common.Day;
-import nl.tvandijk.aoc.common.GenericTransitionSystem;
+import nl.tvandijk.aoc.common.TransitionSystem;
 import nl.tvandijk.aoc.common.Pair;
 
 import java.util.*;
@@ -277,29 +277,13 @@ public class Day23 extends Day {
         pos[18] = read(lines[2].charAt(9));
         pos[19] = read(lines[3].charAt(9));
 
-        var ts = new GenericTransitionSystem<State>() {
-            @Override
-            public Collection<State> initial() {
-                return List.of(new State(pos));
-            }
-
-            @Override
-            public Collection<Pair<State, Long>> successors(State state) {
-                return state.successors();
-            }
-
-            @Override
-            public boolean isFinal(State state) {
-                return state.isFinal();
-            }
-        };
-
-        var res = ts.reachFinal();
-        System.out.println("Part 1: " + res.a.get(res.b.get(res.b.size()-1)));
+        var ts = new TransitionSystem<>(State::successors);
+        var result = ts.reachFinal(List.of(new State(pos)), State::isFinal);
+        System.out.println("Part 1: " + result.a.get(result.b.get(result.b.size()-1)));
 
         if (PRINTPATH) {
-            var distance = res.a;
-            for (var state : res.b) {
+            var distance = result.a;
+            for (var state : result.b) {
                 System.out.printf("At distance %d:%n", distance.get(state));
                 System.out.println(state.draw());
             }
@@ -695,36 +679,20 @@ public class Day23 extends Day {
         pos[26] = 3;
         pos[27] = read(lines[3].charAt(9));
 
-        var ts = new GenericTransitionSystem<State2>() {
-            @Override
-            public Collection<State2> initial() {
-                return List.of(new State2(pos));
-            }
-
-            @Override
-            public Collection<Pair<State2, Long>> successors(State2 state) {
-                return state.successors();
-            }
-
-            @Override
-            public boolean isFinal(State2 state) {
-                return state.isFinal();
-            }
-        };
-
-        var res = ts.reachFinal();
-        System.out.println("Part 2: " + res.a.get(res.b.get(res.b.size()-1)));
+        var ts = new TransitionSystem<>(State2::successors);
+        var result = ts.reachFinal(List.of(new State2(pos)), State2::isFinal);
+        System.out.println("Part 2: " + result.a.get(result.b.get(result.b.size()-1)));
 
         if (PRINTPATH) {
-            var distance = res.a;
-            for (var state : res.b) {
+            var distance = result.a;
+            for (var state : result.b) {
                 System.out.printf("At distance %d:%n", distance.get(state));
                 System.out.println(state.draw());
             }
         }
 
         if (COUNTALL) {
-            System.out.println("Total number of states: "+ts.reachAll().size());
+            System.out.println("Total number of states: "+ts.reachAll(List.of(new State2(pos))).size());
         }
     }
 
