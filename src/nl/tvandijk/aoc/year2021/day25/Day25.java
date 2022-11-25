@@ -1,13 +1,6 @@
 package nl.tvandijk.aoc.year2021.day25;
 
 import nl.tvandijk.aoc.common.Day;
-import nl.tvandijk.aoc.common.Pair;
-import nl.tvandijk.aoc.common.TransitionSystem;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 public class Day25 extends Day {
     int wide;
@@ -25,9 +18,7 @@ public class Day25 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
-        var lines = fileContents.split(System.lineSeparator());
-
+    protected Object part1() {
         wide = lines[0].length();
         var grid = fileContents.replaceAll("[\r\n ]+", "").chars().map(x -> x == '>' ? 1 : x == 'v' ? 2 : 0).toArray();
         high = grid.length / wide;
@@ -75,21 +66,16 @@ public class Day25 extends Day {
                 else sb.append('.');
             }
 
-            System.out.println("After step " + steps);
-            System.out.println(sb);
-            System.out.println();
+//            System.out.println("After step " + steps);
+//            System.out.println(sb);
+//            System.out.println();
         }
 
-        System.out.println("Count: " + steps);
+        return steps;
     }
 
     @Override
-    protected void part2(String fileContents) {
-        var lines = fileContents.split(System.lineSeparator());
-
-    }
-
-    public static void main(String[] args) {
-        run(Day25::new, "example.txt", "input.txt");
+    protected Object part2() {
+        return null;
     }
 }

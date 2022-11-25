@@ -1,72 +1,59 @@
 package nl.tvandijk.aoc.year2020.day17;
 
-import java.util.HashSet;
+import java.util.*;
 
 public class Space {
-    Location space;
-    HashSet<Location> locs = new HashSet<>();
+    private Set<Point> locs = new HashSet<>();
 
-    {
-        space = new Location() {
-            @Override
-            public boolean has(int x, int y, int z, int w) {
-                return false;
-            }
-        };
+    public void add(int ... dims) {
+        locs.add(new Point(dims));
     }
 
-    Location add(int x, int y, int z, int w) {
-        space = new Location(x, y, z, w, space);
-        return locs.add(space) ? space : null;
+    private void addNeighbors(Collection<Point> targetSet, int[] loc, int k, boolean change) {
+        if (k == loc.length) {
+            if (change) targetSet.add(new Point(Arrays.copyOf(loc, k)));
+        } else {
+            addNeighbors(targetSet, loc, k + 1, change);
+            loc[k] -= 1;
+            addNeighbors(targetSet, loc, k + 1, true);
+            loc[k] += 2;
+            addNeighbors(targetSet, loc, k + 1, true);
+            loc[k] -= 1;
+        }
     }
 
-    Location add(Location other) {
-        return add(other.x, other.y, other.z, other.w);
+    private List<Point> neighbors(Point loc) {
+        List<Point> result = new ArrayList<>((int) (Math.pow(3, loc.where.length)-1));
+        addNeighbors(result, loc.where, 0, false);
+        return result;
     }
 
-    void applyRules() {
-        var toCheck = new Space();
-
-        for (Location l : locs) {
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    for (int dz = -1; dz <= 1; dz++) {
-                        for (int dw = -1; dw <= 1; dw++) {
-                            toCheck.add(l.x + dx, l.y + dy, l.z + dz, l.w + dw);
-                        }
-                    }
-                }
-            }
+    public void applyRules() {
+        var toCheck = new HashSet<Point>();
+        for (var loc : locs) {
+            toCheck.add(loc);
+            toCheck.addAll(neighbors(loc));
         }
 
-        var nextOne = new Space();
-
-        for (Location loc : toCheck.locs) {
-            // check neighbors
-            var c = countNeighbors(loc);
-            if (space.has(loc.x, loc.y, loc.z, loc.w)) {
+        var nextOne = new HashSet<Point>();
+        for (var loc : toCheck) {
+            // count number of enabled neighbors
+            int c = 0;
+            for (var n : neighbors(loc)) {
+                if (locs.contains(n)) c++;
+            }
+            // apply correct case
+            if (locs.contains(loc)) {
                 if (c == 2 || c == 3) nextOne.add(loc);
             } else {
                 if (c == 3) nextOne.add(loc);
             }
         }
 
-        this.space = nextOne.space;
-        this.locs = nextOne.locs;
+        locs = nextOne;
     }
 
-    int countNeighbors(Location loc) {
-        int count = 0;
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    for (int dw = -1; dw <= 1; dw++) {
-                        if (dx == 0 && dy == 0 && dz == 0 && dw == 0) continue;
-                        if (space.has(loc.x + dx, loc.y + dy, loc.z + dz, loc.w + dw)) count++;
-                    }
-                }
-            }
-        }
-        return count;
+    public int size() {
+        return locs.size();
     }
 }

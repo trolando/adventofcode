@@ -1,15 +1,18 @@
 package nl.tvandijk.aoc.year2020.day4;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Day4 extends AoCCommon {
+public class Day4 extends Day {
+    public Day4() {
+        super(new String[] {"example.txt", "example2.txt", "input.txt"});
+    }
+
     private static boolean validateByr(String s) {
         try {
             int year = Integer.valueOf(s);
@@ -123,32 +126,34 @@ public class Day4 extends AoCCommon {
     }
 
     @Override
-    protected void process(InputStream stream) throws Exception {
-        try (var reader = new BufferedReader(new InputStreamReader(stream))) {
-            List<String> lines = new ArrayList<>();
-
-            int count1 = 0;
-            int count2 = 0;
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().isBlank()) {
-                    if (validate1(lines)) count1++;
-                    if (validate2(lines)) count2++;
-                    lines.clear();
-                } else {
-                    lines.add(line);
-                }
+    protected Object part1() {
+        int count = 0;
+        List<String> linesSoFar = new ArrayList<>();
+        for (var line : lines) {
+            if (line.trim().isBlank()) {
+                if (validate1(linesSoFar)) count++;
+                linesSoFar.clear();
+            } else {
+                linesSoFar.add(line);
             }
-            if (validate1(lines)) count1++;
-            if (validate2(lines)) count2++;
-
-            System.out.println("Correct (part 1): " + count1);
-            System.out.println("Correct (part 2): " + count2);
         }
+        if (validate1(linesSoFar)) count++;
+        return count;
     }
 
-    public static void main(String[] args) {
-        run(Day4::new, "example.txt", "example2.txt", "input.txt");
+    @Override
+    protected Object part2() {
+        int count = 0;
+        List<String> linesSoFar = new ArrayList<>();
+        for (var line : lines) {
+            if (line.trim().isBlank()) {
+                if (validate2(linesSoFar)) count++;
+                linesSoFar.clear();
+            } else {
+                linesSoFar.add(line);
+            }
+        }
+        if (validate2(linesSoFar)) count++;
+        return count;
     }
 }

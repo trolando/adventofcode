@@ -1,19 +1,17 @@
 package nl.tvandijk.aoc.year2020.day8;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.*;
-
-public class Day8 extends AoCCommon {
+public class Day8 extends Day {
     @Override
-    protected void process(InputStream stream) {
-        var program = new Program(stream);
-        int val = program.runUntilRepeat();
-        System.out.printf("Result: %d\n", val);
-        program.attemptToFix();
+    protected Object part1() throws Exception {
+        var program = new Program(lines);
+        return program.runUntilRepeat();
     }
 
-    public static void main(String[] args) {
-        run(Day8::new, "example.txt", "input.txt");
+    @Override
+    protected Object part2() throws Exception {
+        var program = new Program(lines);
+        return program.attemptToFix();
     }
 }

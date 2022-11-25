@@ -1,13 +1,8 @@
 package nl.tvandijk.aoc.year2020.day23;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-public class Day23 extends AoCCommon {
+public class Day23 extends Day {
     private static final boolean VERBOSE = false;
 
     private Cup buildCups(String line, Cup[] cups) {
@@ -92,19 +87,25 @@ public class Day23 extends AoCCommon {
         return cur.getNext();
     }
 
-    private void part1(String line) {
+    @Override
+    protected Object part1() {
+        String line = lines[0];
+
         Cup[] cups = new Cup[line.length()];
         Cup cur = buildCups(line, cups);
         for (int i=0; i<100; i++) cur = move(cur);
 
-        System.out.print("Result of part 1: ");
+        var sb = new StringBuilder();
         for (Cup print=cups[0].getNext(); print!=cups[0]; print=print.getNext()) {
-            System.out.printf("%d", print.value);
+            sb.append(String.valueOf(print.value));
         }
-        System.out.println();
+        return sb.toString();
     }
 
-    private void part2(String line) {
+    @Override
+    protected Object part2() {
+        String line = lines[0];
+
         Cup[] cups = new Cup[1000000];
         Cup cur = buildCups(line, cups);
         for (int i=0; i<10000000; i++) cur = move(cur);
@@ -116,21 +117,7 @@ public class Day23 extends AoCCommon {
         long vb = b.value;
         long m = va * vb;
 
-        System.out.printf("Result of part 2: %d %d ==> %d\n", va, vb, m);
-    }
-
-    @Override
-    public void process(InputStream stream) throws IOException {
-        /**
-         * In today's puzzle, there is just one line, which is a series of numbers...
-         */
-        var line = new BufferedReader(new InputStreamReader(stream)).readLine();
-
-        part1(line);
-        part2(line);
-    }
-
-    public static void main(String[] args) {
-        run(Day23::new, "example.txt", "input.txt");
+//        System.out.printf("Result of part 2: %d %d ==> %d\n", va, vb, m);
+        return m;
     }
 }

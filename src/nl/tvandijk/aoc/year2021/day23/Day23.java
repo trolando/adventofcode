@@ -1,10 +1,13 @@
 package nl.tvandijk.aoc.year2021.day23;
 
 import nl.tvandijk.aoc.common.Day;
-import nl.tvandijk.aoc.common.TransitionSystem;
-import nl.tvandijk.aoc.common.Pair;
+import nl.tvandijk.aoc.util.Pair;
+import nl.tvandijk.aoc.util.TransitionSystem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class Day23 extends Day {
     private final static boolean PRINTPATH = false;
@@ -264,9 +267,7 @@ public class Day23 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
-        var lines = fileContents.split(System.lineSeparator());
-
+    protected Object part1() {
         var pos = new int[20];
         pos[12] = read(lines[2].charAt(3));
         pos[13] = read(lines[3].charAt(3));
@@ -279,7 +280,6 @@ public class Day23 extends Day {
 
         var ts = new TransitionSystem<>(State::successors);
         var result = ts.reachFinal(List.of(new State(pos)), State::isFinal);
-        System.out.println("Part 1: " + result.a.get(result.b.get(result.b.size()-1)));
 
         if (PRINTPATH) {
             var distance = result.a;
@@ -288,6 +288,9 @@ public class Day23 extends Day {
                 System.out.println(state.draw());
             }
         }
+
+        return result.a.get(result.b.get(result.b.size()-1));
+
 
 //        test(distance, new State(new int[]{0,0,0,2,0,0,0,0,0,0,0,0,2,1,3,4,0,3,4,1}));
 //        test(distance, new State(new int[]{0,0,0,2,0,0,0,0,0,0,0,0,2,1,0,4,3,3,4,1}));
@@ -658,9 +661,7 @@ public class Day23 extends Day {
     } // class
 
     @Override
-    protected void part2(String fileContents) {
-        var lines = fileContents.split(System.lineSeparator());
-
+    protected Object part2() {
         var pos = new int[28];
         pos[12] = read(lines[2].charAt(3));
         pos[13] = 4;
@@ -681,7 +682,6 @@ public class Day23 extends Day {
 
         var ts = new TransitionSystem<>(State2::successors);
         var result = ts.reachFinal(List.of(new State2(pos)), State2::isFinal);
-        System.out.println("Part 2: " + result.a.get(result.b.get(result.b.size()-1)));
 
         if (PRINTPATH) {
             var distance = result.a;
@@ -694,9 +694,7 @@ public class Day23 extends Day {
         if (COUNTALL) {
             System.out.println("Total number of states: "+ts.reachAll(List.of(new State2(pos))).size());
         }
-    }
 
-    public static void main(String[] args) {
-        run(Day23::new, "example.txt", "input.txt");
+        return result.a.get(result.b.get(result.b.size()-1));
     }
 }

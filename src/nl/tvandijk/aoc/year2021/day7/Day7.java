@@ -4,14 +4,11 @@ import nl.tvandijk.aoc.common.Day;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class Day7 extends Day {
-
     @Override
-    protected void part1(String fileContents) {
+    protected Object part1() {
         var numbers = Arrays.stream(fileContents.trim().split(",")).map(Integer::valueOf).sorted().collect(Collectors.toList());
         int result = 0;
 
@@ -20,7 +17,7 @@ public class Day7 extends Day {
             numbers = numbers.subList(1, numbers.size()-1);
         }
 
-        System.out.println("puzzle solution part 1: " + result);
+        return result;
 
         // 16,1,2,0,4,2,7,1,2,14
         // 0,1,1,2,2,2,4,7,14,16
@@ -45,7 +42,7 @@ public class Day7 extends Day {
     }
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         var numbers = Arrays.stream(fileContents.trim().split(",")).map(Integer::valueOf).sorted().collect(Collectors.toList());
         var lowest = numbers.get(0);
         var highest = numbers.get(numbers.size()-1);
@@ -59,10 +56,6 @@ public class Day7 extends Day {
             bestFuel = Math.min(bestFuel, theCost);
         }
 
-        System.out.println("Result of part 2: " + bestFuel);
-    }
-
-    public static void main(String[] args) {
-        run(Day7::new, "example.txt", "input.txt");
+        return bestFuel;
     }
 }

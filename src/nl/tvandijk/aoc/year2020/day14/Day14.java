@@ -1,14 +1,16 @@
 package nl.tvandijk.aoc.year2020.day14;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Day14 extends AoCCommon {
+public class Day14 extends Day {
+    public Day14() {
+        super("example1.txt", "example2.txt", "input.txt");
+    }
 
     private static long applyMask(long value, String mask) {
         long M = 1L;
@@ -28,7 +30,12 @@ public class Day14 extends AoCCommon {
         return value;
     }
 
-    private long executePart1(InputParser.StartContext tree) {
+    @Override
+    protected Object part1() throws Exception {
+        var lexer = new InputLexer(CharStreams.fromString(fileContents));
+        var parser = new InputParser(new CommonTokenStream(lexer));
+        var tree = parser.start();
+
         String mask = null;
         Map<Long, Long> memory = new HashMap<>();
 
@@ -48,7 +55,12 @@ public class Day14 extends AoCCommon {
         return memory.values().stream().mapToLong(l->l).sum();
     }
 
-    private long executePart2(InputParser.StartContext tree) {
+    @Override
+    protected Object part2() throws Exception {
+        var lexer = new InputLexer(CharStreams.fromString(fileContents));
+        var parser = new InputParser(new CommonTokenStream(lexer));
+        var tree = parser.start();
+
         String mask = null;
         TreeNode currentMemory = null;
 
@@ -65,19 +77,5 @@ public class Day14 extends AoCCommon {
         }
 
         return currentMemory.computeValue();
-    }
-
-    @Override
-    protected void process(InputStream stream) throws Exception {
-        var lexer = new InputLexer(CharStreams.fromStream(stream));
-        var parser = new InputParser(new CommonTokenStream(lexer));
-        var tree = parser.start();
-
-        System.out.printf("Result of part 1: %d\n", executePart1(tree));
-        System.out.printf("Result of part 2: %d\n", executePart2(tree));
-    }
-
-    public static void main(String[] args) {
-        run(Day14::new, "example1.txt", "example2.txt", "input.txt");
     }
 }

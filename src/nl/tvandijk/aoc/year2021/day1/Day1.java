@@ -4,11 +4,18 @@ import nl.tvandijk.aoc.common.Day;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Day1 extends Day {
-    private void doFirstPart(int[] numbers) {
+    private int[] numbers;
+
+    @Override
+    protected void processInput(String fileContents) {
+        var lexer = new InputLexer(CharStreams.fromString(fileContents));
+        var parser = new InputParser(new CommonTokenStream(lexer));
+        numbers = parser.root().meter().stream().mapToInt(mctx -> Integer.parseInt(mctx.getText())).toArray();
+    }
+
+    @Override
+    protected Object part1() {
         int prevNumber = 0;
         int numbercount = 0;
         int howOftenDidDepthIncrease = 0;
@@ -20,53 +27,17 @@ public class Day1 extends Day {
             numbercount++;
         }
 
-        System.out.println("Puzzle 1 output: " + howOftenDidDepthIncrease);
+        return howOftenDidDepthIncrease;
     }
 
-    private void doSecondPart(int[] numbers) {
-        List<Integer> listOfWindows = new ArrayList<>();
-
-        for (int i = 2; i < numbers.length; i++) {
-            int window = numbers[i-2] + numbers[i-1] + numbers[i];
-            listOfWindows.add(window);
-        }
-
-        int prevNumber = 0;
-        int numbercount = 0;
-        int howOftenDidDepthIncrease = 0;
-
-        for (var number : listOfWindows) {
-            if (numbercount != 0 && number > prevNumber) howOftenDidDepthIncrease++;
-
-            prevNumber = number;
-            numbercount++;
-        }
-
-        System.out.println("Puzzle 2 output: " + howOftenDidDepthIncrease);
-    }
-
-    private void doSecondPartAnotherWay(int[] numbers) {
+    @Override
+    protected Object part2() {
         int howOftenDidDepthIncrease = 0;
 
         for (int i = 3; i < numbers.length; i++) {
             if (numbers[i] > numbers[i-3]) howOftenDidDepthIncrease++;
         }
 
-        System.out.println("Puzzle 2 output: " + howOftenDidDepthIncrease);
-    }
-
-    protected void process(String fileContents) throws Exception {
-        var lexer = new InputLexer(CharStreams.fromString(fileContents));
-        var parser = new InputParser(new CommonTokenStream(lexer));
-
-        var theNumbersFromTheFile = parser.root().meter().stream().mapToInt(mctx -> Integer.parseInt(mctx.getText())).toArray();
-
-        doFirstPart(theNumbersFromTheFile);
-        doSecondPart(theNumbersFromTheFile);
-        doSecondPartAnotherWay(theNumbersFromTheFile);
-    }
-
-    public static void main(String[] args) {
-        run(Day1::new, "example.txt", "input.txt");
+        return howOftenDidDepthIncrease;
     }
 }

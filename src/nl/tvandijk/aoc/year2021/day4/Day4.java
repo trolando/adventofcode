@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Day4 extends Day {
-
     private static class Board {
         int[] fields;
         boolean[] seen;
@@ -95,18 +94,14 @@ public class Day4 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
+    protected Object part1() {
         var results = computeBingoResults(fileContents);
-        System.out.println("Result of part 1 = " + results.get(0));
+        return results.get(0);
     }
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         var results = computeBingoResults(fileContents);
-        System.out.println("Result of part 2 = " + results.get(results.size()-1));
-    }
-
-    public static void main(String[] args) {
-        run(Day4::new, "example.txt", "input.txt");
+        return results.get(results.size()-1);
     }
 }

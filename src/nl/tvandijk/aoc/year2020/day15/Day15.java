@@ -1,11 +1,14 @@
 package nl.tvandijk.aoc.year2020.day15;
 
+import nl.tvandijk.aoc.common.Day;
+
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-public class Puzzle15 {
-    static long partA(int[] starting, int halt) {
-
-        ConcurrentSkipListMap<Integer, Integer> numbers = new ConcurrentSkipListMap<>();
+public class Day15 extends Day {
+    private static long speak(int[] starting, int halt) {
+        HashMap<Integer, Integer> numbers = new HashMap<>();
 
         int lastNumber = 0;
         int lastAge = 0;
@@ -24,29 +27,38 @@ public class Puzzle15 {
 
         while (true) {
             if (t == (halt-1)) {
-                System.out.printf("\n");
                 return lastAge;
             }
             lastNumber = lastAge;
             var L = numbers.get(lastNumber);
             lastAge = L == null ? 0 : t-L;
             numbers.put(lastNumber, t);
-            //System.out.printf(", " + lastNumber);
             t++;
         }
     }
 
+    @Override
+    protected Object part1() throws Exception {
+        var numbers = Arrays.stream(lines[0].trim().split(",")).mapToInt(Integer::parseInt).toArray();
+        return speak(numbers, 2020);
+    }
+
+    @Override
+    protected Object part2() throws Exception {
+        var numbers = Arrays.stream(lines[0].trim().split(",")).mapToInt(Integer::parseInt).toArray();
+        return speak(numbers, 30000000);
+    }
 
     public static void go(int[] numbers) {
         long before = System.nanoTime();
-        var res = partA(numbers, 30000000);
+        var res = speak(numbers, 30000000);
         long after = System.nanoTime();
 
         System.out.printf("time: %f us, rseult = %d\n", ((double)(after-before))/1000, res);
     }
 
 
-    public static void main(String[] args) {
+    public static void test() {
         go(new int[] {0,3,6});
         go(new int[] {1,3,2});
         go(new int[] {2,1,3});
@@ -54,6 +66,6 @@ public class Puzzle15 {
         go(new int[] {2,3,1});
         go(new int[] {3,2,1});
         go(new int[] {3,1,2});
-        go(new int[] {16,12,1,0,15,7,11});
+//        go(new int[] {16,12,1,0,15,7,11});
     }
 }

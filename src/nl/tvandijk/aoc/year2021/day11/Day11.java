@@ -65,7 +65,8 @@ public class Day11 extends Day {
         return true;
     }
 
-    private void parse(String fileContents) {
+    @Override
+    protected void processInput(String fileContents) {
         grid = new int[100];
         flashCount = 0;
         flashQueue = new ArrayDeque<>();
@@ -77,29 +78,24 @@ public class Day11 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
-        parse(fileContents);
-
+    protected Object part1() {
         for (int i=0; i<100; i++) {
             step();
         }
-
-        System.out.println("Part 1: " + flashCount);
+        return flashCount;
     }
 
     @Override
-    protected void part2(String fileContents) {
-        parse(fileContents);
+    protected boolean resetForPartTwo() {
+        return true;
+    }
 
+    @Override
+    protected Object part2() {
         int steps = 1;
         while (!step()) {
             steps++;
         }
-
-        System.out.println("Part 2: " + steps);
-    }
-
-    public static void main(String[] args) {
-        run(Day11::new, "example.txt", "input.txt");
+        return steps;
     }
 }

@@ -1,7 +1,7 @@
 package nl.tvandijk.aoc.year2021.day20;
 
 import nl.tvandijk.aoc.common.Day;
-import nl.tvandijk.aoc.common.Pair;
+import nl.tvandijk.aoc.util.Pair;
 
 import java.util.*;
 
@@ -88,8 +88,7 @@ public class Day20 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
-        var lines = fileContents.split("[\r\n]+");
+    protected Object part1() {
         alg = lines[0].trim();
         for (int i = 1; i < lines.length; i++) {
             for (int j=0; j<lines[i].length(); j++) {
@@ -102,20 +101,16 @@ public class Day20 extends Day {
         for (int i = 0; i < 2; i++) {
             x = new Enhanced(x);
         }
-        System.out.println("Part 1: " + x.pixels.size());
+        return x.pixels.size();
     }
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         Enhanced x = new Enhanced(pixels);
         for (int i = 0; i < 50; i++) {
             x = new Enhanced(x);
 //            System.out.printf("Enhanced %d times: %d pixels are different!%n", (i+1), x.pixels.size());
         }
-        System.out.println("Part 2: " + x.pixels.size());
-    }
-
-    public static void main(String[] args) {
-        run(Day20::new, "example.txt", "input.txt");
+        return x.pixels.size();
     }
 }

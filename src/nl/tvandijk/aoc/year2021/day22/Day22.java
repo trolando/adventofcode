@@ -5,6 +5,11 @@ import nl.tvandijk.aoc.common.Day;
 import java.util.*;
 
 public class Day22 extends Day {
+    public Day22() {
+        super();
+        super.inputs = new String[] {"example.txt", "example2.txt", "input.txt"};
+    }
+
     private static final class Cube {
         int value;
         long xmin;
@@ -58,11 +63,13 @@ public class Day22 extends Day {
         }
     }
 
-    @Override
-    protected void part1(String fileContents) {
-        var lines = fileContents.split(System.lineSeparator());
+    private List<Cube> cubes;
 
-        var cubes = new ArrayList<Cube>();
+    @Override
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
+
+        cubes = new ArrayList<Cube>();
 
         for (var line : lines) {
             var parts = line.split("[,=. ]+");
@@ -92,29 +99,25 @@ public class Day22 extends Day {
                 cubes.add(newCube); // and add lights on
             }
         }
+    }
 
+    @Override
+    protected Object part1() {
         var outer = new Cube(0, -50, 50, -50, 50, -50, 50);
         long sum = 0;
         for (var s : cubes) {
             var ol = outer.overlap(s, s.value);
             if (ol.valid()) sum += ol.eval();
         }
-        System.out.println("Part 1: " + sum);
-
-        sum = 0;
-        for (var s : cubes) {
-            sum += s.eval();
-        }
-        System.out.println("Part 2: " + sum);
-
+        return sum;
     }
 
     @Override
-    protected void part2(String fileContents) {
-        // Already done in part1
-    }
-
-    public static void main(String[] args) {
-        run(Day22::new, "example.txt", "example2.txt", "input.txt");
+    protected Object part2() {
+        long sum = 0;
+        for (var s : cubes) {
+            sum += s.eval();
+        }
+        return sum;
     }
 }

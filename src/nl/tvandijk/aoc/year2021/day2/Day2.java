@@ -5,9 +5,12 @@ import nl.tvandijk.aoc.common.Day;
 import java.util.StringTokenizer;
 
 public class Day2 extends Day {
+    @Override
+    protected void processInput(String fileContents) {
+    }
 
     @Override
-    protected void part1(String fileContents) {
+    protected Integer part1() {
         int x = 0;
         int depth = 0;
 
@@ -28,11 +31,11 @@ public class Day2 extends Day {
             }
         }
 
-        System.out.println("Part 1 result: " + (x * depth));
+        return (x * depth);
     }
 
     @Override
-    protected void part2(String fileContents) {
+    protected Integer part2() {
         int x = 0;
         int depth = 0;
         int aim = 0;
@@ -56,10 +59,6 @@ public class Day2 extends Day {
             }
         }
 
-        System.out.println("Part 2 result: " + (x * depth));
-    }
-
-    public static void main(String[] args) {
-        run(Day2::new, "example.txt", "input.txt");
+        return (x * depth);
     }
 }

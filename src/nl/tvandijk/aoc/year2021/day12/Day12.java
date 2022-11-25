@@ -11,7 +11,10 @@ public class Day12 extends Day {
     private boolean[] visited;  // whether a location is visited in the current dfs
     private long pathCount = 0; // number of distinct paths found
 
-    private void parse(String fileContents) {
+    @Override
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
+
         var locs = new ArrayList<String>();
         locs.add("start"); // encode start as 0
         locs.add("end");   // encode end as 1
@@ -19,7 +22,6 @@ public class Day12 extends Day {
         var edgelist = new ArrayList<Integer>();
 
         // parse each line
-        var lines = fileContents.split("[\r\n]+");
         for (int i = 0; i < lines.length; i++) {
             // split each line into two parts
             var parts = lines[i].split("-");
@@ -83,20 +85,19 @@ public class Day12 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
-        parse(fileContents);
+    protected Object part1() {
         createPaths(0,false);
-        System.out.println("Part 1: " + pathCount);
+        return pathCount;
     }
 
     @Override
-    protected void part2(String fileContents) {
-        parse(fileContents);
+    protected Object part2() {
         createPaths(0,true);
-        System.out.println("Part 2: " + pathCount);
+        return pathCount;
     }
 
-    public static void main(String[] args) {
-        run(Day12::new, "example.txt", "input.txt");
+    @Override
+    protected boolean resetForPartTwo() {
+        return true;
     }
 }

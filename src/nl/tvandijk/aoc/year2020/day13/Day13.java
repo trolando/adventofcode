@@ -1,26 +1,12 @@
 package nl.tvandijk.aoc.year2020.day13;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Day13 extends AoCCommon {
-    public void solve1(int timestamp, String[] parts) {
-        int[] services = Arrays.stream(parts).filter(x -> !x.equals("x")).mapToInt(x -> Integer.valueOf(x)).toArray();
-
-        for (int i = timestamp; true; i++) {
-            for (int j = 0; j < services.length; j++) {
-                if ((i%services[j])==0) {
-                    System.out.printf("Found: %d * %d = %d\n", services[j], i-timestamp, ((services[j]*(i-timestamp))));
-                    return;
-                }
-            }
-        }
-    }
-
+public class Day13 extends Day {
     private static long solve2(String[] parts) {
         // STEP 1: transform the input.txt string to an array of services and array of indices
         List<Integer> services = new ArrayList<>();
@@ -53,24 +39,34 @@ public class Day13 extends AoCCommon {
     }
 
     @Override
-    protected void process(InputStream stream) throws Exception {
-        try (var br = new BufferedReader(new InputStreamReader(stream))) {
-            int timestamp = Integer.parseInt(br.readLine());
-            String[] parts = br.readLine().split(",");
+    protected Object part1() throws Exception {
+        int timestamp = Integer.parseInt(lines[0]);
+        String[] parts = lines[1].split(",");
 
-            solve1(timestamp, parts);
-            System.out.printf("m = %d\n", solve2(parts));
+        int[] services = Arrays.stream(parts).filter(x -> !x.equals("x")).mapToInt(x -> Integer.valueOf(x)).toArray();
+
+        for (int i = timestamp; true; i++) {
+            for (int service : services) {
+                if ((i % service) == 0) {
+                    //System.out.printf("Found: %d * %d = %d\n", services[j], i-timestamp, ((services[j]*(i-timestamp))));
+                    return service * (i - timestamp);
+                }
+            }
         }
     }
 
-    public static void main(String[] args) {
+    @Override
+    protected Object part2() throws Exception {
+        String[] parts = lines[1].split(",");
+        return solve2(parts);
+    }
+
+    public static void test() {
         System.out.printf("%d\n", solve2(new String[] {"17","x","13","19"}));
         System.out.printf("%d\n", solve2(new String[] {"67","7","59","61"}));
         System.out.printf("%d\n", solve2(new String[] {"67","x","7","59","61"}));
         System.out.printf("%d\n", solve2(new String[] {"67","7","x","59","61"}));
         System.out.printf("%d\n", solve2(new String[] {"1789","37","47","1889"}));
         System.out.println();
-
-        run(Day13::new, "example.txt", "input.txt");
     }
 }

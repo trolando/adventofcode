@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Day18 extends Day {
+    public Day18() {
+        super(new String[] {"example.txt", "example2.txt", "input.txt"});
+    }
+
     private static class Snail {
         private int n;
         private Snail left;
@@ -137,18 +141,19 @@ public class Day18 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) throws IOException {
+    protected Object part1() throws IOException {
         Snail s = null;
         var lines = fileContents.split("[\r\n]+");
         for (var line : lines) {
             if (s == null) s = new Snail(line);
             else s = new Snail(s, new Snail(line));
         }
-        if (s != null) System.out.println("Part 1: " + s.magnitude() + " (" + s + ")");
+        if (s != null) return s.magnitude() + " (" + s + ")";
+        else return null;
     }
 
     @Override
-    protected void part2(String fileContents) throws IOException {
+    protected Object part2() throws IOException {
         int largest = Integer.MIN_VALUE;
         var lines = fileContents.split("[\r\n]+");
         for (int i = 0; i < lines.length; i++) {
@@ -158,10 +163,6 @@ public class Day18 extends Day {
                 }
             }
         }
-        System.out.println("Part 2: " + largest);
-    }
-
-    public static void main(String[] args) {
-        run(Day18::new, "example.txt", "input.txt");
+        return largest;
     }
 }

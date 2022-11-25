@@ -1,13 +1,12 @@
 package nl.tvandijk.aoc.year2020.day11;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Day11 extends AoCCommon {
+public class Day11 extends Day {
     int[] board;
     int width, height;
 
@@ -97,41 +96,48 @@ public class Day11 extends AoCCommon {
         return change;
     }
 
-    public void process(InputStream stream) {
+    @Override
+    protected Object part1() throws Exception {
         List<Integer> arr = new ArrayList<>();
 
-        try (var br = new BufferedReader(new InputStreamReader(stream))) {
-            String line;
-            while ((line=br.readLine()) != null) {
-                for (int i = 0; i < line.length(); i++) {
-                    if (line.charAt(i) == 'L') arr.add(0);
-                    else if (line.charAt(i) == '.') arr.add(-1);
-                    else if (line.charAt(i) == '#') arr.add(1);
-                }
-                height++;
+        for (var line : lines) {
+            for (int i = 0; i < line.length(); i++) {
+                if (line.charAt(i) == 'L') arr.add(0);
+                else if (line.charAt(i) == '.') arr.add(-1);
+                else if (line.charAt(i) == '#') arr.add(1);
             }
-            board = arr.stream().mapToInt(x -> x).toArray();
-            width = board.length/height;
-            int count=0;
-            while (apply()) {
-                count++;
-            }
-            // count occupied
-            count = (int) Arrays.stream(board).filter(x-> x == 1).count();
-            System.out.println("Result: " + count);
-
-            board = arr.stream().mapToInt(x -> x).toArray();
-            width = board.length/height;
-            while (apply2()) ;
-            // count occupied
-            count = (int) Arrays.stream(board).filter(x-> x == 1).count();
-            System.out.println("Result: " + count);
-        } catch (IOException e) {
-            e.printStackTrace();
+            height++;
         }
+
+        board = arr.stream().mapToInt(x -> x).toArray();
+        width = board.length/height;
+        while (apply()) ;
+        // count occupied
+        return Arrays.stream(board).filter(x-> x == 1).count();
     }
 
-    public static void main(String[] args) {
-        run(Day11::new, "example.txt", "input.txt");
+    @Override
+    protected Object part2() throws Exception {
+        List<Integer> arr = new ArrayList<>();
+
+        for (var line : lines) {
+            for (int i = 0; i < line.length(); i++) {
+                if (line.charAt(i) == 'L') arr.add(0);
+                else if (line.charAt(i) == '.') arr.add(-1);
+                else if (line.charAt(i) == '#') arr.add(1);
+            }
+            height++;
+        }
+
+        board = arr.stream().mapToInt(x -> x).toArray();
+        width = board.length/height;
+        while (apply2()) ;
+        // count occupied
+        return (int) Arrays.stream(board).filter(x-> x == 1).count();
+    }
+
+    @Override
+    protected boolean resetForPartTwo() {
+        return true;
     }
 }

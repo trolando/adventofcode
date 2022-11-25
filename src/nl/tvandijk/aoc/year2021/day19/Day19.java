@@ -1,7 +1,7 @@
 package nl.tvandijk.aoc.year2021.day19;
 
 import nl.tvandijk.aoc.common.Day;
-import nl.tvandijk.aoc.common.Pair;
+import nl.tvandijk.aoc.util.Pair;
 
 import java.util.*;
 
@@ -215,8 +215,12 @@ public class Day19 extends Day {
         return result;
     }
 
+    private Scanner result;
+    private int maxDist;
+
     @Override
-    protected void part1(String fileContents) {
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
         var scanners = orientations(parse(fileContents)).toArray(ScannerOrientation[]::new);
         var orientation = new Scanner[scanners.length];
         var position = new Pos3[scanners.length];
@@ -243,12 +247,12 @@ public class Day19 extends Day {
             }
         }
 
-        var result = new Scanner(orientation[0]);
+        result = new Scanner(orientation[0]);
         for (int i = 1; i < scanners.length; i++) {
             result.add(orientation[i], position[i]);
         }
 
-        int maxDist = Integer.MIN_VALUE;
+        maxDist = Integer.MIN_VALUE;
         for (int i = 0; i < position.length; i++) {
             for (int j = i+1; j < position.length; j++) {
                 var one = position[i];
@@ -257,17 +261,15 @@ public class Day19 extends Day {
                 maxDist = Math.max(maxDist, d);
             }
         }
-
-        System.out.println("Part 1: " + result.beacons.size());
-        System.out.println("Part 2: " + maxDist);
     }
 
     @Override
-    protected void part2(String fileContents) {
-        // Actually we did part 2 in part 1...
+    protected Object part1() {
+        return result.beacons.size();
     }
 
-    public static void main(String[] args) {
-        run(Day19::new, "example.txt", "input.txt");
+    @Override
+    protected Object part2() {
+        return maxDist;
     }
 }

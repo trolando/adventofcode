@@ -1,15 +1,13 @@
 package nl.tvandijk.aoc.year2020.day24;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Day24 extends AoCCommon {
+public class Day24 extends Day {
     private Set<HexagonalCoordinate> blackTiles = new HashSet<>();
 
     private int countAdjacent(HexagonalCoordinate p) {
@@ -48,8 +46,10 @@ public class Day24 extends AoCCommon {
     }
 
     @Override
-    public void process(InputStream stream) throws IOException {
-        var lexer = new InputLexer(CharStreams.fromStream(stream));
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
+
+        var lexer = new InputLexer(CharStreams.fromString(fileContents));
         var parser = new InputParser(new CommonTokenStream(lexer));
         var tree = parser.root();
 
@@ -82,18 +82,19 @@ public class Day24 extends AoCCommon {
 
             if (!blackTiles.remove(p)) blackTiles.add(p);
         }
+    }
 
-        System.out.println("Solution of part 1: " + blackTiles.size());
+    @Override
+    protected Object part1() throws Exception {
+        return blackTiles.size();
+    }
 
+    @Override
+    protected Object part2() throws Exception {
         for (int i = 0; i < 100; i++) {
             day();
             // System.out.printf("Day %d: %d\n", i+1, blackTiles.size());
         }
-
-        System.out.println("Solution of part 2: " + blackTiles.size());
-    }
-
-    public static void main(String[] args) {
-        run(Day24::new, "example.txt", "input.txt");
+        return blackTiles.size();
     }
 }

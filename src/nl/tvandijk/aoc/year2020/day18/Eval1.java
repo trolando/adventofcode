@@ -1,8 +1,8 @@
 package nl.tvandijk.aoc.year2020.day18;
 
-public class Eval extends ExprBaseVisitor<Long> {
+public class Eval1 extends Expr1BaseVisitor<Long> {
     @Override
-    public Long visitOpExpr(ExprParser.OpExprContext ctx) {
+    public Long visitOpExpr(Expr1Parser.OpExprContext ctx) {
         var left = visit(ctx.left);
         var right = visit(ctx.right);
         switch (ctx.op.getText().charAt(0)) {
@@ -16,12 +16,12 @@ public class Eval extends ExprBaseVisitor<Long> {
     }
 
     @Override
-    public Long visitAtomExpr(ExprParser.AtomExprContext ctx) {
+    public Long visitAtomExpr(Expr1Parser.AtomExprContext ctx) {
         return Long.valueOf(ctx.getText());
     }
 
     @Override
-    public Long visitParenExpr(ExprParser.ParenExprContext ctx) {
+    public Long visitParenExpr(Expr1Parser.ParenExprContext ctx) {
         return this.visit(ctx.expr());
     }
 }

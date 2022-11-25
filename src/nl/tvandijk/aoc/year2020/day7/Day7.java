@@ -1,13 +1,16 @@
 package nl.tvandijk.aoc.year2020.day7;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.*;
 import java.util.*;
 
-public class Day7 extends AoCCommon {
+public class Day7 extends Day {
+    public Day7() {
+        super("example.txt", "example2.txt", "input.txt");
+    }
+
     private Map<String, List<String>> heldBy = new HashMap<>();
     private Map<String, List<String>> holds = new HashMap<>();
 
@@ -20,8 +23,10 @@ public class Day7 extends AoCCommon {
     }
 
     @Override
-    protected void process(InputStream stream) throws Exception {
-        var lexer = new InputLexer(CharStreams.fromStream(stream));
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
+
+        var lexer = new InputLexer(CharStreams.fromString(fileContents));
         var parser = new InputParser(new CommonTokenStream(lexer));
 
         for (var line : parser.root().line()) {
@@ -48,7 +53,10 @@ public class Day7 extends AoCCommon {
                 heldBy.putIfAbsent(bag, new LinkedList<>());
             }
         }
+    }
 
+    @Override
+    protected Object part1() throws Exception {
         Set<String> result = new HashSet<>();
         Queue<String> front = new LinkedList<>();
         result.add("shiny gold");
@@ -62,12 +70,14 @@ public class Day7 extends AoCCommon {
             }
         }
 
-        System.out.println("Total bags that could contain shiny gold: " + (result.size()-1) + " " + Arrays.deepToString(result.toArray()));
-
-        System.out.println("Total that contained in shiny gold: " + counter("shiny gold"));
+        // Total bags that could contain shiny gold
+        // Arrays.deepToString(result.toArray());
+        return result.size() - 1;
     }
 
-    public static void main(String[] args) {
-        run(Day7::new, "example.txt", "example2.txt", "input.txt");
+    @Override
+    protected Object part2() throws Exception {
+        // Total that contained in shiny gold
+        return counter("shiny gold");
     }
 }

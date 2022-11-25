@@ -3,7 +3,6 @@ package nl.tvandijk.aoc.year2021.day14;
 import nl.tvandijk.aoc.common.Day;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Day14 extends Day {
     private String compounds;
@@ -64,21 +63,17 @@ public class Day14 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
+    protected Object part1() {
         parse(fileContents);
         for (int i = 0; i < 10; i++) step();
-        System.out.println("Part 1: " + count());
+        return count();
     }
 
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         parse(fileContents);
         for (int i = 0; i < 40; i++) step();
-        System.out.println("Part 2: " + count());
-    }
-
-    public static void main(String[] args) {
-        run(Day14::new, "example.txt", "input.txt");
+        return count();
     }
 }

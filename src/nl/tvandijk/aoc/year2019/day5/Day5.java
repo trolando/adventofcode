@@ -117,7 +117,7 @@ public class Day5 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
+    protected Object part1() {
         // example: 1,9,10,3,2,3,11,0,99,30,40,50
 
         int[] data = Arrays.stream(fileContents.split("[,\\s]+")).mapToInt(Integer::parseInt).toArray();
@@ -126,28 +126,18 @@ public class Day5 extends Day {
         input.add(1);
         data = runProgram(data, input, output);
 
-        System.out.println("Part 1: " + output);
+        return output;
     }
 
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         int[] data = Arrays.stream(fileContents.split("[,\\s]+")).mapToInt(Integer::parseInt).toArray();
         List<Integer> input = new ArrayList<>();
         List<Integer> output = new ArrayList<>();
         input.add(5);
         data = runProgram(data, input, output);
 
-        System.out.println("Part 2: " + output);
-    }
-
-    @Override
-    protected void process(String fileContents) {
-        part1(fileContents);
-        part2(fileContents);
-    }
-
-    public static void main(String[] args) {
-        run(Day5::new, "example.txt", "input.txt");
+        return output;
     }
 }

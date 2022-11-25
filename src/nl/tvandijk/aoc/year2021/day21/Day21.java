@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Day21 extends Day {
-    int die = 1;
-    int rolls = 0;
+    private int die = 1;
+    private int rolls = 0;
 
     private int roll() {
         rolls++;
@@ -18,7 +18,7 @@ public class Day21 extends Day {
         return r;
     }
 
-    private void part1loop(int p1, int p2) {
+    private Object part1loop(int p1, int p2) {
         die = 1;
         rolls = 0;
         long s1 = 0;
@@ -29,16 +29,14 @@ public class Day21 extends Day {
             while (p1 > 10) p1 -= 10;
             s1 += p1;
             if (s1 >= 1000) {
-                System.out.println("Part 1: " + s2 * rolls);
-                return;
+                return s2 * rolls;
             }
             add = roll() + roll() + roll();
             p2 += add;
             while (p2 > 10) p2 -= 10;
             s2 += p2;
             if (s2 >= 1000) {
-                System.out.println("Part 1: " + s1 * rolls);
-                return;
+                return s1 * rolls;
             }
         }
     }
@@ -104,7 +102,7 @@ public class Day21 extends Day {
         }
     }
 
-    private void part2loop(int p1, int p2)
+    private Object part2loop(int p1, int p2)
     {
         Map<State,Long> states = new HashMap<>();
         states.put(new State(p1, p2, 0, 0), 1L);
@@ -145,23 +143,29 @@ public class Day21 extends Day {
             states = next;
         }
 
-        System.out.printf("Part 2: %d%n", Math.max(wins1, wins2));
+        return Math.max(wins1, wins2);
     }
 
+    private int a;
+    private int b;
 
     @Override
-    protected void part1(String fileContents) {
-        part1loop(4, 8);
-        part1loop(8, 6);
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
+
+        var tokens = lines[0].split("\\s+");
+        a = Integer.parseInt(tokens[tokens.length-1]);
+        tokens = lines[1].split("\\s+");
+        b = Integer.parseInt(tokens[tokens.length-1]);
     }
 
     @Override
-    protected void part2(String fileContents) {
-        part2loop(4, 8);
-        part2loop(8, 6);
+    protected Object part1() {
+        return part1loop(a, b);
     }
 
-    public static void main(String[] args) {
-        run(Day21::new, "input.txt");
+    @Override
+    protected Object part2() {
+        return part2loop(a, b);
     }
 }

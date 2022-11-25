@@ -42,12 +42,12 @@ public class Day13 extends Day {
 
     private Set<Point> points;
 
-    void parse(String fileContents, boolean oneFold) {
-        var lines = fileContents.split("[\r\n]+");
+    void parse(boolean oneFold) {
         points = new HashSet<>();
 
         boolean dots = true;
         for (var line : lines) {
+            if (line.isEmpty()) continue;
             if (line.startsWith("fold")) dots = false;
 
             if (dots) {
@@ -73,14 +73,14 @@ public class Day13 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
-        parse(fileContents, true);
-        System.out.println("Part 1: " + points.size());
+    protected Object part1() {
+        parse(true);
+        return points.size();
     }
 
     @Override
-    protected void part2(String fileContents) {
-        parse(fileContents, false);
+    protected Object part2() {
+        parse(false);
 
         int cx = points.stream().mapToInt(p -> p.x).max().orElseThrow()+1;
         int cy = points.stream().mapToInt(p -> p.y).max().orElseThrow()+1;
@@ -90,17 +90,12 @@ public class Day13 extends Day {
 
         StringBuilder sb = new StringBuilder();
         for (int y = 0; y < cy; y++) {
+            sb.append("\n");
             for (int x = 0; x < cx; x++) {
                 sb.append(grid[cx*y+x] ? "#" : " ");
             }
-            sb.append("\n");
         }
 
-        System.out.println("Part 2:");
-        System.out.println(sb);
-    }
-
-    public static void main(String[] args) {
-        run(Day13::new, "example.txt", "input.txt");
+        return sb;
     }
 }

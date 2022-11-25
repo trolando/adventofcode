@@ -5,13 +5,11 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class Day8 extends Day {
-
     @Override
-    protected void part1(String fileContents) {
+    protected Object part1() {
         var lexer = new DigitsLexer(CharStreams.fromString(fileContents));
         var parser = new DigitsParser(new CommonTokenStream(lexer));
         var tree = parser.root();
@@ -28,7 +26,7 @@ public class Day8 extends Day {
             }
         }
 
-        System.out.printf("Puzzle part 1: %d%n", result);
+        return result;
     }
 
     /*
@@ -143,7 +141,7 @@ the 6 lengths:
     }
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         var lexer = new DigitsLexer(CharStreams.fromString(fileContents));
         var parser = new DigitsParser(new CommonTokenStream(lexer));
         var tree = parser.root();
@@ -152,13 +150,9 @@ the 6 lengths:
 
         for (var line : tree.line()) {
             numberSum += decodeLine(line);
-            System.out.println("Line is " + decodeLine(line));
+//            System.out.println("Line is " + decodeLine(line));
         }
 
-        System.out.printf("Puzzle part 2: %d%n", numberSum);
-    }
-
-    public static void main(String[] args) {
-        run(Day8::new, "example.txt", "input.txt");
+        return numberSum;
     }
 }

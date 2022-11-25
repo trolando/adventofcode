@@ -1,35 +1,45 @@
 package nl.tvandijk.aoc.year2020.day17;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.*;
-
-public class Day17 extends AoCCommon {
+public class Day17 extends Day {
     @Override
-    public void process(InputStream stream) throws IOException {
-        try (var br = new BufferedReader(new InputStreamReader(stream))) {
-            Space space = new Space();
+    protected Object part1() {
+        var space = new Space();
 
-            String line;
-            int y=0;
-            while ((line = br.readLine()) != null) {
-                for (int x = 0; x < line.length(); x++) {
-                    if (line.charAt(x) == '#') {
-                        space.add(x, y, 0, 0);
-                    }
-                }
-                y++;
+        int y=0;
+        for (var line : lines) {
+            for (int x = 0; x < line.length(); x++) {
+                if (line.charAt(x) == '#') space.add(x, y, 0);
             }
-
-            System.out.printf("Count after %d: %d\n", 0, space.locs.size());
-            for (int i = 0; i < 6; i++) {
-                space.applyRules();
-                System.out.printf("Count after %d: %d\n", i+1, space.locs.size());
-            }
+            y++;
         }
+
+        for (int i = 0; i < 6; i++) {
+            space.applyRules();
+//            System.out.printf("Count after %d: %d\n", i+1, space.size());
+        }
+
+        return space.size();
     }
 
-    public static void main(String[] args) {
-        run(Day17::new, "example.txt", "input.txt");
+    @Override
+    protected Object part2() throws Exception {
+        var space = new Space();
+
+        int y=0;
+        for (var line : lines) {
+            for (int x = 0; x < line.length(); x++) {
+                if (line.charAt(x) == '#') space.add(x, y, 0, 0);
+            }
+            y++;
+        }
+
+        for (int i = 0; i < 6; i++) {
+            space.applyRules();
+//            System.out.printf("Count after %d: %d\n", i+1, space.size());
+        }
+
+        return space.size();
     }
 }

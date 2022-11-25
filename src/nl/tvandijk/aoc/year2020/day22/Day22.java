@@ -1,15 +1,13 @@
 package nl.tvandijk.aoc.year2020.day22;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Day22 extends AoCCommon {
+public class Day22 extends Day {
     public static class Game {
         private final Set<State> seenStates = new HashSet<>();
         private State state;
@@ -161,8 +159,8 @@ public class Day22 extends AoCCommon {
     }
 
     @Override
-    public void process(InputStream stream) throws IOException {
-        var lexer = new InputLexer(CharStreams.fromStream(stream));
+    protected Object part1() throws Exception {
+        var lexer = new InputLexer(CharStreams.fromString(fileContents));
         var parser = new InputParser(new CommonTokenStream(lexer));
         var tree = parser.players();
 
@@ -176,15 +174,27 @@ public class Day22 extends AoCCommon {
         Game normalGame = new Game(new NormalGameState(deck1, deck2));
         normalGame.playNormalGame();
 
-        System.out.printf("normal scores: player 1 %d and player 2 %d\n", normalGame.score(1), normalGame.score(2));
+//        System.out.printf("normal scores: player 1 %d and player 2 %d\n", normalGame.score(1), normalGame.score(2));
+        return Math.max(normalGame.score(1), normalGame.score(2));
+    }
+
+    @Override
+    protected Object part2() throws Exception {
+        var lexer = new InputLexer(CharStreams.fromString(fileContents));
+        var parser = new InputParser(new CommonTokenStream(lexer));
+        var tree = parser.players();
+
+        var deck1 = tree.player(0).card().stream()
+                .map(x -> Integer.parseInt(x.getText()))
+                .collect(Collectors.toList());
+        var deck2 = tree.player(1).card().stream()
+                .map(x -> Integer.parseInt(x.getText()))
+                .collect(Collectors.toList());
 
         Game recursiveGame = new Game(new RecursiveGameState(deck1, deck2));
         recursiveGame.playRecursiveGame();
 
-        System.out.printf("recursive scores: player 1 %d and player 2 %d\n", recursiveGame.score(1), recursiveGame.score(2));
-    }
-
-    public static void main(String[] args) {
-        run(Day22::new, "example.txt", "input.txt");
+//        System.out.printf("recursive scores: player 1 %d and player 2 %d\n", recursiveGame.score(1), recursiveGame.score(2));
+        return Math.max(recursiveGame.score(1), recursiveGame.score(2));
     }
 }

@@ -1,20 +1,29 @@
 package nl.tvandijk.aoc.year2020.day6;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Day6 extends AoCCommon {
-    @Override
-    protected void process(InputStream stream) throws Exception {
-        var lexer = new InputLexer(CharStreams.fromStream(stream));
-        var parser = new InputParser(new CommonTokenStream(lexer));
-        var tree = parser.root();
+public class Day6 extends Day {
+    private InputParser.RootContext tree;
 
+    @Override
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
+
+        var lexer = new InputLexer(CharStreams.fromString(fileContents));
+        var parser = new InputParser(new CommonTokenStream(lexer));
+        tree = parser.root();
+    }
+
+    @Override
+    protected Object part1() throws Exception {
         List<Set<Character>> groups = new ArrayList<>();
 
         for (var groupCtx : tree.group()) {
@@ -25,8 +34,12 @@ public class Day6 extends AoCCommon {
             groups.add(set);
         }
 
-        System.out.printf("Sum of unique letters: %d\n", groups.stream().mapToInt(Set::size).sum());
+        // Sum of unique letters
+        return groups.stream().mapToInt(Set::size).sum();
+    }
 
+    @Override
+    protected Object part2() throws Exception {
         long count = 0;
         for (var groupCtx : tree.group()) {
             Set<Character> set = null;
@@ -37,11 +50,7 @@ public class Day6 extends AoCCommon {
             }
             count += set.size();
         }
-
-        System.out.printf("Unique letters part 2: %d\n", count);
-    }
-
-    public static void main(String[] args) {
-        run(Day6::new, "example.txt", "input.txt");
+        // unique letters part 23
+        return count;
     }
 }

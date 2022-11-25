@@ -38,7 +38,7 @@ public class Day17 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
+    protected Object part1() {
         var s = fileContents.trim().split("[ =,.]+");
         int tx1 = Integer.parseInt(s[3]);
         int tx2 = Integer.parseInt(s[4]);
@@ -51,11 +51,11 @@ public class Day17 extends Day {
                 high = Math.max(high, new Probe(dx, dy, tx1, tx2, ty1, ty2).run());
             }
         }
-        System.out.println("Part 1: " + high);
+        return high;
     }
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         var s = fileContents.trim().split("[ =,.]+");
         int tx1 = Integer.parseInt(s[3]);
         int tx2 = Integer.parseInt(s[4]);
@@ -68,10 +68,6 @@ public class Day17 extends Day {
                 if (new Probe(dx, dy, tx1, tx2, ty1, ty2).run() != Integer.MIN_VALUE) cnt++;
             }
         }
-        System.out.println("Part 2: " + cnt);
-    }
-
-    public static void main(String[] args) {
-        run(Day17::new, "example.txt", "input.txt");
+        return cnt;
     }
 }

@@ -67,21 +67,15 @@ public class Day10 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
-        var lines = fileContents.split("[\r\n]+");
+    protected Object part1() {
         var result = Arrays.stream(lines).mapToLong(this::checkLine).filter(x -> x>0).sum();
-        System.out.println("part 1 = " + result);
+        return result;
     }
 
     @Override
-    protected void part2(String fileContents) {
-        var lines = fileContents.split("[\r\n]+");
+    protected Object part2() {
         var result = Arrays.stream(lines).mapToLong(this::checkLine).filter(x -> x<0).sorted().toArray();
         var median = -result[result.length/2];
-        System.out.println("part 2 = " + median);
-    }
-
-    public static void main(String[] args) {
-        run(Day10::new, "example.txt", "input.txt");
+        return median;
     }
 }

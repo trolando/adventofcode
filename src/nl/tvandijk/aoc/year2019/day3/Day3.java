@@ -124,7 +124,7 @@ public class Day3 extends Day {
 
 
     @Override
-    protected void part1(String fileContents) {
+    protected Object part1() {
         String[] lines = fileContents.split("[\r\n]+");
         var grid = runWires(lines[0], lines[1]);
 
@@ -132,12 +132,12 @@ public class Day3 extends Day {
                 .mapToInt(entry -> Math.abs(entry.getKey().x) + Math.abs(entry.getKey().y))
                 .min().getAsInt();
 
-        System.out.println("part 1 = " + result);
+        return result;
     }
 
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         String[] lines = fileContents.split("[\r\n]+");
         var grid = runWires(lines[0], lines[1]);
 
@@ -145,18 +145,6 @@ public class Day3 extends Day {
                 .mapToInt(entry -> entry.getValue().getTimeSum())
                 .min().getAsInt();
 
-        System.out.println("part 2 = " + result);
-    }
-
-    @Override
-    protected void process(String fileContents) {
-//        test1();
-//        test2();
-        part1(fileContents);
-        part2(fileContents);
-    }
-
-    public static void main(String[] args) {
-        run(Day3::new, "example.txt", "input.txt");
+        return result;
     }
 }

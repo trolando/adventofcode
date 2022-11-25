@@ -36,8 +36,10 @@ public class Day9 extends Day {
         return result;
     }
 
-    private void parseFile(String fileContents) {
-        String[] lines = fileContents.split("\n");
+    @Override
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
+
         width = lines[0].trim().length();
         height = lines.length;
         grid = new int[height * width];
@@ -56,9 +58,7 @@ public class Day9 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
-        parseFile(fileContents);
-
+    protected Object part1() {
         int result = 0;
 
         for (int x = 0; x < width; x++) {
@@ -76,14 +76,12 @@ public class Day9 extends Day {
             }
         }
 
-        System.out.println("part 1: " + result);
+        return result;
     }
 
 
     @Override
-    protected void part2(String fileContents) {
-        parseFile(fileContents);
-
+    protected Object part2() {
         int basinCount = 0;
         List<Integer> basinSizes = new ArrayList<>();
 
@@ -111,10 +109,6 @@ public class Day9 extends Day {
         result *= topValues.get(topValues.size()-2);
         result *= topValues.get(topValues.size()-3);
 
-        System.out.println("part 2: " + result);
-    }
-
-    public static void main(String[] args) {
-        run(Day9::new, "example.txt", "input.txt");
+        return result;
     }
 }

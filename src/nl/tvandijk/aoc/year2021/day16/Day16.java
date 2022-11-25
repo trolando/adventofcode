@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Day16 extends Day {
-
     private static class Packet {
         int version;
         int type;
@@ -117,8 +116,8 @@ public class Day16 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
-        System.out.println("Part 1: " + Parser.parseHex(fileContents.trim()).versionSum());
+    protected Object part1() {
+        return Parser.parseHex(fileContents.trim()).versionSum();
     }
 
     private void eval(String s) {
@@ -126,7 +125,7 @@ public class Day16 extends Day {
     }
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         if (false) {
             eval("C200B40A82");
             eval("04005AC33890");
@@ -138,10 +137,6 @@ public class Day16 extends Day {
             eval("9C0141080250320F1802104A08");
         }
 
-        System.out.println("Part 2: " + Parser.parseHex(fileContents.trim()).eval());
-    }
-
-    public static void main(String[] args) {
-        run(Day16::new, "example.txt", "input.txt");
+        return Parser.parseHex(fileContents.trim()).eval();
     }
 }

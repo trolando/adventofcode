@@ -1,13 +1,8 @@
 package nl.tvandijk.aoc.year2020.day25;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-public class Day25 extends AoCCommon {
+public class Day25 extends Day {
     public long transform(long subjectNumber, long loopSize) {
         long value = 1;
         for (int i = 0; i < loopSize; i++) {
@@ -27,13 +22,9 @@ public class Day25 extends AoCCommon {
     }
 
     @Override
-    public void process(InputStream stream) throws IOException {
-        long cardPublicKey, doorPublicKey;
-
-        try (var br = new BufferedReader(new InputStreamReader(stream))) {
-            cardPublicKey = Long.parseLong(br.readLine());
-            doorPublicKey = Long.parseLong(br.readLine());
-        }
+    protected Object part1() throws Exception {
+        long cardPublicKey = Long.parseLong(lines[0]);
+        long doorPublicKey = Long.parseLong(lines[1]);
 
         // long cardPublicKey = transform(7, cardSecret);
         // long doorPublicKey = transform(7, doorSecret);
@@ -44,10 +35,12 @@ public class Day25 extends AoCCommon {
         var encryptKey = transform(cardPublicKey, doorSecret);
         var encryptKey2 = transform(doorPublicKey, cardSecret);
 
-        System.out.printf("secret: %d or %d\n", encryptKey, encryptKey2);
+//        System.out.printf("secret: %d or %d\n", encryptKey, encryptKey2);
+        return encryptKey;
     }
 
-    public static void main(String[] args) {
-        run(Day25::new, "example.txt", "input.txt");
+    @Override
+    protected Object part2() throws Exception {
+        return null;
     }
 }

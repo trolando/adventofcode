@@ -1,12 +1,10 @@
 package nl.tvandijk.aoc.year2020.day5;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 
-public class Day5 extends AoCCommon {
+public class Day5 extends Day {
 
     private static long decode(String input) {
         long answer = 0;
@@ -24,33 +22,40 @@ public class Day5 extends AoCCommon {
         return answer;
     }
 
-    @Override
-    public void process(InputStream stream) {
+    public void test() {
         var no1 = decode("FBFBBFFRLR");
         var no2 = decode("BFFFBBFRRR");
         var no3 = decode("FFFBBBFRRR");
         var no4 = decode("BBFFBBFRLL");
+    }
 
+    @Override
+    protected Object part1() throws Exception {
+        long biggest = 0;
+        for (var token : tokens) {
+            var dec = decode(token);
+            if (dec > biggest) biggest = dec;
+        }
+        return biggest;
+    }
+
+    @Override
+    protected Object part2() throws Exception {
         Set<Integer> seats = new HashSet<>();
 
         long biggest = 0;
-        try (var sc = new Scanner(new InputStreamReader(stream))) {
-            while (sc.hasNext()) {
-                var dec = decode(sc.next());
-                if (dec > biggest) biggest = dec;
-                seats.add((int) dec);
-            }
-            System.out.printf("Highest seat ID on a boarding pass: %d\n", biggest);
+        for (var token : tokens) {
+            var dec = decode(token);
+            if (dec > biggest) biggest = dec;
+            seats.add((int) dec);
+        }
 
-            for (int i=1; i<biggest; i++) {
-                if (seats.contains(i-1) && !seats.contains(i) && seats.contains(i+1)) {
-                    System.out.printf("Missing ID: %d\n", i);
-                }
+        for (int i=1; i<biggest; i++) {
+            if (seats.contains(i-1) && !seats.contains(i) && seats.contains(i+1)) {
+                return i;
             }
         }
-    }
 
-    public static void main(String[] args) {
-        run(Day5::new, "input.txt");
+        return null;
     }
 }

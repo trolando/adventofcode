@@ -1,6 +1,7 @@
 package nl.tvandijk.aoc.year2020.day8;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,12 +11,8 @@ class Program {
     private List<Instruction> instructions;
     private boolean quit = false;
 
-    public Program(InputStream stream) {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
-            instructions = br.lines().map(this::parseInstruction).collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public Program(String[] lines) {
+        instructions = Arrays.stream(lines).map(this::parseInstruction).collect(Collectors.toList());
     }
 
     public int runUntilRepeat() {
@@ -28,7 +25,6 @@ class Program {
             instructions.get(state.getPc()).run(state);
 
             if (state.getPc() >= instructions.size()) {
-                System.out.printf("Reached end of program: %d\n", state.getAccumulator());
                 quit = true;
                 break;
             }
@@ -37,21 +33,22 @@ class Program {
         return state.getAccumulator();
     }
 
-    public void attemptToFix() {
+    public int attemptToFix() {
         for (int i = 0; i < instructions.size(); i++) {
             Instruction in = instructions.get(i);
             if (in instanceof Noop) {
                 instructions.set(i, ((Noop) in).asJmp());
-                runUntilRepeat();
-                if (quit) return;
+                int res = runUntilRepeat();
+                if (quit) return res;
                 instructions.set(i, in);
             } else if (in instanceof Jmp) {
                 instructions.set(i, ((Jmp) in).asNoop());
-                runUntilRepeat();
-                if (quit) return;
+                int res = runUntilRepeat();
+                if (quit) return res;
                 instructions.set(i, in);
             }
         }
+        return -1;
     }
 
     private Instruction parseInstruction(String line) {

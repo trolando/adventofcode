@@ -105,18 +105,14 @@ public class Day15 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
+    protected Object part1() {
         parse(fileContents);
-        System.out.println("Part 1: " + computeRisk(size));
+        return computeRisk(size);
     }
 
     @Override
-    protected void part2(String fileContents) {
+    protected Object part2() {
         parse(fileContents);
-        System.out.println("Part 2: " + computeRisk(5*size));
-    }
-
-    public static void main(String[] args) {
-        run(Day15::new, "example.txt", "input.txt");
+        return computeRisk(5*size);
     }
 }

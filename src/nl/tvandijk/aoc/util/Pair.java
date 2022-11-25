@@ -1,4 +1,4 @@
-package nl.tvandijk.aoc.common;
+package nl.tvandijk.aoc.util;
 
 import java.util.Objects;
 

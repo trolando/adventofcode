@@ -39,15 +39,14 @@ public class Day2 extends Day {
     }
 
     @Override
-    protected void part1(String fileContents) {
+    protected Object part1() {
         // example: 1,9,10,3,2,3,11,0,99,30,40,50
 
         long[] data = Arrays.stream(fileContents.split(",")).mapToLong(Long::parseLong).toArray();
         data[1] = 12;
         data[2] = 2;
         data = runProgram(data);
-
-        System.out.println("Part 1: " + data[0]);
+        return data[0];
     }
 
     private boolean tryInputs(long[] data, long one, long two, long expected) {
@@ -59,27 +58,18 @@ public class Day2 extends Day {
     }
 
     @Override
-    protected void part2(String fileContents) {
-
+    protected Object part2() {
         long[] data = Arrays.stream(fileContents.split(",")).mapToLong(Long::parseLong).toArray();
 
         for (int one = 0; one < 100; one++) {
             for (int two = 0; two < 100; two++) {
                 if (tryInputs(data, one, two, 19690720)) {
                     System.out.printf("Inputs %d and %d give %d!%n", one, two, 19690720);
-                    System.out.println("Part 2 therefore: " + (one*100+two));
+                    return one*100+two;
                 }
             }
         }
-    }
 
-    @Override
-    protected void process(String fileContents) {
-        part1(fileContents);
-        part2(fileContents);
-    }
-
-    public static void main(String[] args) {
-        run(Day2::new, "example.txt", "input.txt");
+        return null;
     }
 }

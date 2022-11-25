@@ -1,16 +1,16 @@
 package nl.tvandijk.aoc.year2020.day10;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 
-public class Day10 extends AoCCommon {
+public class Day10 extends Day {
     public long[] adapters = null;
     public int count = 0;
+
+    public Day10() {
+        super("example1.txt", "example2.txt", "input.txt");
+    }
 
     public long connect2() {
         long amount = 1;
@@ -47,34 +47,31 @@ public class Day10 extends AoCCommon {
     }
 
     @Override
-    protected void process(InputStream stream) throws Exception {
-        try (var br = new BufferedReader(new InputStreamReader(stream))) {
-            adapters = br.lines().mapToLong(Long::valueOf).toArray();
-            Arrays.sort(adapters);
-            count = adapters.length;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        {
-            int diff1 = 0;
-            int diff3 = 0;
-            for (int i = 0; i<count; i++) {
-                if (i == 0) {
-                    if (adapters[i] == 1) diff1++;
-                    if (adapters[i] == 3) diff3++;
-                } else {
-                    if ((adapters[i] - adapters[i - 1]) == 1) diff1++;
-                    if ((adapters[i] - adapters[i - 1]) == 3) diff3++;
-                }
-            }
-            System.out.println("Result of part 1: " + diff1 * (diff3+1));
-        }
-
-        System.out.println("Result of part 2: " + connect2());
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
+        adapters = Arrays.stream(lines).mapToLong(Long::valueOf).toArray();
+        Arrays.sort(adapters);
+        count = adapters.length;
     }
 
-    public static void main(String[] args) {
-        run(Day10::new, "example1.txt", "example2.txt", "input.txt");
+    @Override
+    protected Object part1() throws Exception {
+        int diff1 = 0;
+        int diff3 = 0;
+        for (int i = 0; i<count; i++) {
+            if (i == 0) {
+                if (adapters[i] == 1) diff1++;
+                if (adapters[i] == 3) diff3++;
+            } else {
+                if ((adapters[i] - adapters[i - 1]) == 1) diff1++;
+                if ((adapters[i] - adapters[i - 1]) == 3) diff3++;
+            }
+        }
+        return diff1 * (diff3+1);
+    }
+
+    @Override
+    protected Object part2() throws Exception {
+        return connect2();
     }
 }

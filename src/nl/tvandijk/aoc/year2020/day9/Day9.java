@@ -1,15 +1,12 @@
 package nl.tvandijk.aoc.year2020.day9;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class Day9 extends AoCCommon {
+public class Day9 extends Day {
     List<Long> numbers = new ArrayList<>();
 
     public long findWeakness(long number) {
@@ -49,22 +46,33 @@ public class Day9 extends AoCCommon {
     }
 
     @Override
-    protected void process(InputStream stream) throws IOException {
-        try (var reader = new BufferedReader(new InputStreamReader(stream))) {
-            for (var number : reader.lines().mapToLong(Long::valueOf).toArray()) {
-                // check if in pair
-                if (isValid(number)) {
-                    numbers.add(number);
-                } else {
-                    System.out.println("Bad number: " + number);
-                    System.out.println("Weakness: " + findWeakness(number));
-                    return;
-                }
+    protected Object part1() throws Exception {
+        var longs = Arrays.stream(lines).mapToLong(Long::valueOf).toArray();
+        for (var number : longs) {
+            if (isValid(number)) {
+                numbers.add(number);
+            } else {
+                return number;
             }
         }
+        return null;
     }
 
-    public static void main(String[] args) {
-        run(Day9::new, "input.txt");
+    @Override
+    protected Object part2() throws Exception {
+        var longs = Arrays.stream(lines).mapToLong(Long::valueOf).toArray();
+        for (var number : longs) {
+            if (isValid(number)) {
+                numbers.add(number);
+            } else {
+                return findWeakness(number);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    protected boolean resetForPartTwo() {
+        return true;
     }
 }

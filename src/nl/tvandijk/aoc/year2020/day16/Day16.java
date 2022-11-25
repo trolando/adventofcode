@@ -1,15 +1,18 @@
 package nl.tvandijk.aoc.year2020.day16;
 
-import nl.tvandijk.aoc.common.AoCCommon;
+import nl.tvandijk.aoc.common.Day;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Day16 extends AoCCommon {
-    List<Field> fields = new ArrayList<>();
+public class Day16 extends Day {
+    private List<Field> fields = new ArrayList<>();
+
+    public Day16() {
+        super("example1.txt", "example2.txt", "input.txt");
+    }
 
     public Field findField(int value) {
         for (var f : fields) {
@@ -27,49 +30,85 @@ public class Day16 extends AoCCommon {
         fields.add(new Field(name, min1, max1, min2, max2));
     }
 
-    List<String> validTickets = new ArrayList<>();
+    private List<String> validTickets = new ArrayList<>();
+
+    public boolean has(Field[] arr, Field val) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == val) return true;
+        }
+
+        return false;
+    }
+
+    public boolean done(Field[] arr) {
+        return !has(arr, null);
+    }
 
     @Override
-    public void process(InputStream stream) {
+    protected Object part1() {
         int phase = 0;
         var pat = Pattern.compile("^([^:]+): (\\d+)-(\\d+) or (\\d+)-(\\d+)$");
 
         long problems = 0;
+
+        for (var line : lines) {
+            if (line.isBlank()) {
+                phase++;
+            } else if (phase == 0) {
+                var m = pat.matcher(line.trim());
+                if (!m.matches()) throw new RuntimeException("Cannot match file on line " + line.trim());
+                parseField(m.group(1), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)),
+                        Integer.parseInt(m.group(4)), Integer.parseInt(m.group(5)));
+            } else if (phase == 1) {
+            } else {
+                if (line.startsWith("nearby tickets")) continue;
+
+                boolean badTicket = false;
+                for (var s : line.split(",")) {
+                    var i = Integer.valueOf(s);
+                    if (findField(i) == null) {
+                        problems += i;
+                        badTicket = true;
+                    }
+                }
+
+                if (!badTicket) validTickets.add(line);
+            }
+        }
+        return problems;
+    }
+
+    @Override
+    protected Object part2() {
+        int phase = 0;
+        var pat = Pattern.compile("^([^:]+): (\\d+)-(\\d+) or (\\d+)-(\\d+)$");
+
         String myTicket = null;
 
-        try (var br = new BufferedReader(new InputStreamReader(stream))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.isBlank()) {
-                    phase++;
-                } else if (phase == 0) {
-                    var m = pat.matcher(line.trim());
-                    if (!m.matches()) throw new RuntimeException("Cannot match file on line " + line.trim());
-                    parseField(m.group(1), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)),
-                            Integer.parseInt(m.group(4)), Integer.parseInt(m.group(5)));
-                } else if (phase == 1) {
-                    if (line.startsWith("your ticket")) continue;
+        for (var line : lines) {
+            if (line.isBlank()) {
+                phase++;
+            } else if (phase == 0) {
+                var m = pat.matcher(line.trim());
+                if (!m.matches()) throw new RuntimeException("Cannot match file on line " + line.trim());
+                parseField(m.group(1), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)),
+                        Integer.parseInt(m.group(4)), Integer.parseInt(m.group(5)));
+            } else if (phase == 1) {
+                if (line.startsWith("your ticket")) continue;
+                myTicket = line.trim();
+            } else {
+                if (line.startsWith("nearby tickets")) continue;
 
-                    myTicket = line.trim();
-                    System.out.println("ticket: " + line);
-                } else {
-                    if (line.startsWith("nearby tickets")) continue;
-
-                    boolean badTicket = false;
-                    for (var s : line.split(",")) {
-                        var i = Integer.valueOf(s);
-                        if (findField(i) == null) {
-                            problems += i;
-                            badTicket = true;
-                        }
+                boolean badTicket = false;
+                for (var s : line.split(",")) {
+                    var i = Integer.valueOf(s);
+                    if (findField(i) == null) {
+                        badTicket = true;
                     }
-
-                    if (!badTicket) validTickets.add(line);
                 }
+
+                if (!badTicket) validTickets.add(line);
             }
-            System.out.println("problems: " + problems);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         // process
@@ -88,7 +127,7 @@ public class Day16 extends AoCCommon {
                 // System.out.println("res: " + res.toString());
                 if (res.size() == 1) {
                     knownFields[i] = res.get(0);
-                    System.out.printf("set %d to %s\n", i, res.get(0));
+//                    System.out.printf("set %d to %s\n", i, res.get(0));
                 }
             }
         }
@@ -99,23 +138,11 @@ public class Day16 extends AoCCommon {
                 result *= Integer.parseInt(myTicket.split(",")[i]);
             }
         }
-
-        System.out.printf("Result: %d\n", result);
+        return result;
     }
 
-    public boolean has(Field[] arr, Field val) {
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] == val) return true;
-        }
-
-        return false;
-    }
-
-    public boolean done(Field[] arr) {
-        return !has(arr, null);
-    }
-
-    public static void main(String[] args) {
-        run(Day16::new, "example1.txt", "example2.txt", "input.txt");
+    @Override
+    protected boolean resetForPartTwo() {
+        return true;
     }
 }

@@ -7,10 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Day3 extends Day {
-
     @Override
-    protected void part1(String fileContents) {
-        var input = Arrays.asList(fileContents.split("\\s+"));
+    protected Object part1() {
+        var input = Arrays.asList(tokens);
 
         int gamma = 0;
         int epsilon = 0;
@@ -27,7 +26,7 @@ public class Day3 extends Day {
             }
         }
 
-        System.out.println("Solution 1: " + gamma*epsilon);
+        return gamma*epsilon;
     }
 
     private char mostOccurringNumber(List<String> binaryNumbers, int position) {
@@ -78,16 +77,12 @@ public class Day3 extends Day {
     }
 
     @Override
-    protected void part2(String fileContents) {
-        var input = Arrays.asList(fileContents.split("\\s+"));
+    protected Object part2() {
+        var input = Arrays.asList(tokens);
 
         var oxygen = binaryToDecimal(computeOxygen(input, 0));
         var scrubbing = binaryToDecimal(computeScrubbing(input, 0));
 
-        System.out.println("Solution of part 2: " + oxygen * scrubbing);
-    }
-
-    public static void main(String[] args) {
-        run(Day3::new, "example.txt", "input.txt");
+        return oxygen * scrubbing;
     }
 }
