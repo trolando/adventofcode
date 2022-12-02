@@ -47,7 +47,7 @@ public abstract class Day {
      */
     protected void processInput(String fileContents) {
         this.fileContents = fileContents;
-        this.lines = fileContents.split(System.lineSeparator());
+        this.lines = fileContents.split("\r?\n"); // supports linux/windows, not older mac
         this.tokens = fileContents.split("\\s+");
     }
 
