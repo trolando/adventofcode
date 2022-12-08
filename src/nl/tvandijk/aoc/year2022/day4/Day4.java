@@ -19,6 +19,6 @@ public class Day4 extends Day {
     @Override
     protected Object part2() {
         return Arrays.stream(lines).map(l -> Arrays.stream(l.split("[,-]")).mapToInt(Integer::parseInt).toArray())
-                .filter(p -> p[0] <= p[2] ? p[1] >= p[2] : p[0] <= p[3]).count();
+                .filter(p -> Math.max(p[0],p[2])<=Math.min(p[1],p[3])).count();
     }
 }
