@@ -1,20 +1,24 @@
 package nl.tvandijk.aoc.year%Year%.day%Day%;
 
+import java.util.*;
 import nl.tvandijk.aoc.common.Day;
 
 public class Day%Day% extends Day {
     @Override
     protected void processInput(String fileContents) {
+        // process the input
         super.processInput(fileContents);
     }
 
     @Override
     protected Object part1() {
+        // part 1
         return null;
     }
 
     @Override
     protected Object part2() {
+        // part 2
         return null;
     }
 }
