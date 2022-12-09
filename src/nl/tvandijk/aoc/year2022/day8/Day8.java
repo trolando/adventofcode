@@ -13,10 +13,8 @@ public class Day8 extends Day {
 
         len = lines[0].trim().length();
         grid = new int[len*len];
-        for (int i = 0; i < len; i++) {
-            for (int j = 0; j < len; j++) {
-                grid[len*i+j] = lines[i].charAt(j)-'0';
-            }
+        for (int i = 0; i < len*len; i++) {
+            grid[i] = lines[i/len].charAt(i%len)-'0';
         }
     }
 
@@ -33,13 +31,12 @@ public class Day8 extends Day {
     protected Object part1() {
         // part 1
         int count=0;
-        for (int y = 0; y < len; y++) {
-            for (int x = 0; x < len; x++) {
-                if (checkVisible(grid[x+y*len], x, y, -1, 0) ||
-                        checkVisible(grid[x+y*len], x, y, 0, -1) ||
-                        checkVisible(grid[x+y*len], x, y, 1, 0) ||
-                        checkVisible(grid[x+y*len], x, y, 0, 1)) count++;
-            }
+        for (int i = 0; i < len*len; i++) {
+            int x=i%len, y=i/len;
+            if (checkVisible(grid[x+y*len], x, y, -1, 0) ||
+                checkVisible(grid[x+y*len], x, y, 0, -1) ||
+                checkVisible(grid[x+y*len], x, y, 1, 0) ||
+                checkVisible(grid[x+y*len], x, y, 0, 1)) count++;
         }
         return count;
     }
@@ -59,14 +56,13 @@ public class Day8 extends Day {
     protected Object part2() {
         // part 2
         int highest = 0;
-        for (int y = 0; y < len; y++) {
-            for (int x = 0; x < len; x++) {
-                int score = countVisible(grid[x+y*len], x, y, -1, 0) *
-                        countVisible(grid[x+y*len], x, y, 0, -1) *
-                        countVisible(grid[x+y*len], x, y, 1, 0) *
-                        countVisible(grid[x+y*len], x, y, 0, 1);
-                if (score > highest) highest = score;
-            }
+        for (int i = 0; i < len*len; i++) {
+            int x=i%len, y=i/len;
+            int score = countVisible(grid[x+y*len], x, y, -1, 0) *
+                    countVisible(grid[x+y*len], x, y, 0, -1) *
+                    countVisible(grid[x+y*len], x, y, 1, 0) *
+                    countVisible(grid[x+y*len], x, y, 0, 1);
+            if (score > highest) highest = score;
         }
         return highest;
     }
