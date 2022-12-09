@@ -11,22 +11,27 @@ public class Day9 extends Day {
         super.processInput(fileContents);
     }
 
-    private void follow(Point head, Point tail) {
-        int ca = head.a-tail.a;
-        int cb = head.b-tail.b;
-        if (ca > 1 || ca < -1 || cb > 1 || cb < -1) {
-            if (cb == 0) {
-                if (ca > 1) tail.a++;
-                else tail.a--;
-            } else if (ca == 0) {
-                if (cb > 1) tail.b++;
-                else tail.b--;
+    private Point follow(Point head, Point tail) {
+        int cx = head.x-tail.x;
+        int cy = head.y-tail.y;
+        if (cx > 1 || cx < -1 || cy > 1 || cy < -1) {
+            int x = tail.x;
+            int y = tail.y;
+            if (cy == 0) {
+                if (cx > 1) x++;
+                else x--;
+            } else if (cx == 0) {
+                if (cy > 1) y++;
+                else y--;
             } else {
-                if (ca > 0) tail.a++;
-                if (ca < 0) tail.a--;
-                if (cb > 0) tail.b++;
-                if (cb < 0) tail.b--;
+                if (cx > 0) x++;
+                if (cx < 0) x--;
+                if (cy > 0) y++;
+                if (cy < 0) y--;
             }
+            return Point.of(x, y);
+        } else {
+            return tail;
         }
     }
 
@@ -41,14 +46,14 @@ public class Day9 extends Day {
             int amount = Integer.parseInt(line.substring(2));
             for (int i = 0; i < amount; i++) {
                 switch (line.charAt(0)) {
-                    case 'R' -> head.a++;
-                    case 'L' -> head.a--;
-                    case 'U' -> head.b++;
-                    case 'D' -> head.b--;
+                    case 'R' -> head = head.delta(1, 0);
+                    case 'L' -> head = head.delta(-1, 0);
+                    case 'U' -> head = head.delta(0, 1);
+                    case 'D' -> head = head.delta(0, -1);
                     default -> System.out.println("error");
                 }
-                follow(head, tail);
-                visited.add(new Point(tail.a, tail.b));
+                tail = follow(head, tail);
+                visited.add(tail);
             }
         }
         return visited.size();
@@ -67,16 +72,16 @@ public class Day9 extends Day {
             int amount = Integer.parseInt(line.substring(2));
             for (int i = 0; i < amount; i++) {
                 switch (line.charAt(0)) {
-                    case 'R' -> knots[0].a++;
-                    case 'L' -> knots[0].a--;
-                    case 'U' -> knots[0].b++;
-                    case 'D' -> knots[0].b--;
+                    case 'R' -> knots[0] = knots[0].delta(1, 0);
+                    case 'L' -> knots[0] = knots[0].delta(-1, 0);
+                    case 'U' -> knots[0] = knots[0].delta(0, 1);
+                    case 'D' -> knots[0] = knots[0].delta(0, -1);
                     default -> System.out.println("error");
                 }
                 for (int j = 1; j < knots.length; j++) {
-                    follow(knots[j-1], knots[j]);
+                    knots[j] = follow(knots[j-1], knots[j]);
                 }
-                visited.add(new Point(knots[knots.length-1]));
+                visited.add(knots[knots.length-1]);
             }
         }
         return visited.size();
