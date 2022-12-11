@@ -24,7 +24,8 @@ public class Day10 extends Day {
                 X += Integer.parseInt(l.substring(5));
             }
         }
-        return 20*values.get(19) + 60*values.get(59) + 100*values.get(99) + 140*values.get(139) + 180*values.get(179) + 220*values.get(219);
+        return 20*values.get(19) + 60*values.get(59) + 100*values.get(99) +
+                140*values.get(139) + 180*values.get(179) + 220*values.get(219);
     }
 
     @Override
@@ -45,8 +46,9 @@ public class Day10 extends Day {
             if (i%40 == 0) System.out.println();
             int v = values.get(i);
             if (Math.abs(v-(i%40)) <= 1) System.out.print("#");
-            else System.out.print(".");
+            else System.out.print(" ");
         }
+        System.out.println();
         return null;
     }
 }
