@@ -1,5 +1,7 @@
 package nl.tvandijk.aoc.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Point {
@@ -21,6 +23,27 @@ public class Point {
 
     public Point delta(int dx, int dy) {
         return new Point(x+dx, y+dy);
+    }
+
+    public List<Point> adjacent(boolean diag) {
+        var res = new ArrayList<Point>();
+        res.add(delta(-1, 0));
+        res.add(delta(1, 0));
+        res.add(delta(0, -1));
+        res.add(delta(0, 1));
+        if (diag) {
+            res.add(delta(-1, 1));
+            res.add(delta(-1, -1));
+            res.add(delta(1, -1));
+            res.add(delta(1, 1));
+        }
+        return res;
+    }
+
+    public boolean inside(int minx, int miny, int width, int height) {
+        int maxx = minx+width;
+        int maxy = miny+height;
+        return this.x >= minx && this.x < maxx && this.y >= miny && this.y < maxy;
     }
 
     @Override

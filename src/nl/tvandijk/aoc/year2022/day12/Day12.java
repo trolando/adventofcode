@@ -41,16 +41,16 @@ public class Day12 extends Day {
     protected Object part1() {
         // part 1
         int[] dist = new int[width * height];
-        List<Point> q = new ArrayList<>();
+        var q = new ArrayDeque<Point>();
         q.add(start);
         while (!q.isEmpty()) {
-            Point cur = q.remove(0);
+            Point cur = q.remove();
             int d = dist[cur.x+cur.y*width];
             for (var p : cur.adjacent(false)) {
                 if (!p.inside(0, 0, width, height)) continue;
-                if (dist[p.x+p.y*width] != 0) continue;
-                if (map[p.x+p.y*width] - map[cur.x+cur.y*width] > 1) continue;
-                dist[p.x+p.y*width] = d+1;
+                if (dist[p.x + p.y * width] != 0) continue;
+                if (map[p.x + p.y * width] - map[cur.x + cur.y * width] > 1) continue;
+                dist[p.x + p.y * width] = d+1;
                 q.add(p);
             }
         }
@@ -60,24 +60,24 @@ public class Day12 extends Day {
     @Override
     protected Object part2() {
         // part 2
-        int[] dist = new int[width * height];
-        List<Point> q = new ArrayList<>();
+        Map<Point, Integer> distances = new HashMap<>();
+        var q = new ArrayDeque<Point>();
         q.add(end);
+        distances.put(end, 0);
         while (!q.isEmpty()) {
-            Point cur = q.remove(0);
-            int d = dist[cur.x + cur.y * width];
+            Point cur = q.remove();
+            int d = distances.get(cur);
             for (var p : cur.adjacent(false)) {
                 if (!p.inside(0, 0, width, height)) continue;
-                if (dist[p.x + p.y * width] != 0) continue;
+                if (distances.containsKey(p)) continue;
                 if (map[cur.x + cur.y * width] - map[p.x + p.y * width] > 1) continue;
-                dist[p.x + p.y * width] = d + 1;
+                distances.put(p, d+1);
                 q.add(p);
             }
         }
-        int best = Integer.MAX_VALUE;
-        for (int i = 0; i < width * height; i++) {
-            if (map[i] == 0 && dist[i]!=0 && dist[i] < best) best = dist[i];
-        }
-        return best;
+        return distances.entrySet().stream()
+                .filter(e -> map[e.getKey().x + e.getKey().y*width] == 0)
+                .mapToInt(e -> e.getValue())
+                .min().getAsInt();
     }
 }
