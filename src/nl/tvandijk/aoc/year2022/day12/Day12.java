@@ -40,30 +40,31 @@ public class Day12 extends Day {
     @Override
     protected Object part1() {
         // part 1
-        int[] dist = new int[width * height];
+        Map<Point, Integer> distances = new HashMap<>();
+        distances.put(start, 0);
         var q = new ArrayDeque<Point>();
         q.add(start);
         while (!q.isEmpty()) {
             Point cur = q.remove();
-            int d = dist[cur.x+cur.y*width];
+            int d = distances.get(cur);
             for (var p : cur.adjacent(false)) {
                 if (!p.inside(0, 0, width, height)) continue;
-                if (dist[p.x + p.y * width] != 0) continue;
+                if (distances.containsKey(p)) continue;
                 if (map[p.x + p.y * width] - map[cur.x + cur.y * width] > 1) continue;
-                dist[p.x + p.y * width] = d+1;
+                distances.put(p, d+1);
                 q.add(p);
             }
         }
-        return dist[end.x+end.y*width];
+        return distances.get(end);
     }
 
     @Override
     protected Object part2() {
         // part 2
         Map<Point, Integer> distances = new HashMap<>();
+        distances.put(end, 0);
         var q = new ArrayDeque<Point>();
         q.add(end);
-        distances.put(end, 0);
         while (!q.isEmpty()) {
             Point cur = q.remove();
             int d = distances.get(cur);
