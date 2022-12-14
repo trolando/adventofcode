@@ -1,10 +1,12 @@
 package nl.tvandijk.aoc.year2022.day13;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import nl.tvandijk.aoc.common.Day;
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.RuleNode;
 
 public class Day13 extends Day {
     @Override
@@ -13,35 +15,44 @@ public class Day13 extends Day {
         super.processInput(fileContents);
     }
 
-    private Object convert(PacketsParser.ListContext context) {
-        var r = new ArrayList<>();
-        for (var c : context.children) {
-            if (c instanceof PacketsParser.ListContext cl) r.add(convert(cl));
-            else if (c instanceof PacketsParser.NumberContext cn) r.add(Integer.parseInt(cn.getText()));
+    static class Visitor extends PacketsBaseVisitor<Object> {
+        @Override
+        public Integer visitNumber(PacketsParser.NumberContext ctx) {
+            return Integer.parseInt(ctx.getText());
         }
-        return r;
+
+        @Override
+        public List<Object> visitList(PacketsParser.ListContext ctx) {
+            return ctx.children.stream().map(this::visit).filter(Objects::nonNull).collect(Collectors.toList());
+        }
+
+        @Override
+        public Object visitRoot(PacketsParser.RootContext ctx) {
+            return visitList(ctx.list());
+        }
     }
 
-    private Object convert(String s) {
-        PacketsLexer lexer = new PacketsLexer(CharStreams.fromString(s));
-        PacketsParser parser = new PacketsParser(new CommonTokenStream(lexer));
-        return convert(parser.root().list());
+    private final Map<String, Object> parsedStrings = new HashMap<>();
+
+    private Object parse(String s) {
+        return parsedStrings.computeIfAbsent(s, k -> {
+            PacketsLexer lexer = new PacketsLexer(CharStreams.fromString(k));
+            PacketsParser parser = new PacketsParser(new CommonTokenStream(lexer));
+            return new Visitor().visit(parser.root());
+        });
     }
 
     private int compareList(List<Object> left, List<Object> right) {
-        for (int i = 0; i < left.size(); i++) {
-            if (i >= right.size()) return 1;
-            switch (compare(left.get(i), right.get(i))) {
-                case -1 -> {
-                    return -1;
-                }
-                case 1 -> {
-                    return 1;
-                }
-            }
+        final int lsize = left.size();
+        final int rsize = right.size();
+        int i=0;
+        while (true) {
+            if (i >= lsize) return lsize == rsize ? 0 : -1;
+            if (i >= rsize) return 1;
+            int cmp = compare(left.get(i), right.get(i));
+            if (cmp != 0) return cmp;
+            i++;
         }
-        if (left.size() < right.size()) return -1;
-        else return 0;
     }
 
     private int compare(Object left, Object right) {
@@ -51,21 +62,22 @@ public class Day13 extends Day {
             if (((Integer)left) < ((Integer)right)) return  -1;
             if (((Integer)left) > ((Integer)right)) return  1;
             return 0;
-        } else if (l && r) {
-            var ll = (List<Object>) left;
-            var lr = (List<Object>) right;
-            return compareList(ll, lr);
-        } else if (l) {
-            var ll = (List<Object>) left;
-            var lr = new ArrayList<Object>();
-            lr.add(right);
-            return compareList(ll, lr);
-        } else {
-            var ll = new ArrayList<Object>();
-            ll.add(left);
-            var lr = (List<Object>) right;
-            return compareList(ll, lr);
         }
+        List<Object> ll;
+        if (l) {
+            ll = (List<Object>) left;
+        } else {
+            ll = new ArrayList<>();
+            ll.add(left);
+        }
+        List<Object> lr;
+        if (r) {
+            lr = (List<Object>) right;
+        } else {
+            lr = new ArrayList<>();
+            lr.add(right);
+        }
+        return compareList(ll, lr);
     }
 
     @Override
@@ -75,7 +87,7 @@ public class Day13 extends Day {
         var parts = fileContents.split("\n\n");
         for (int i = 0; i < parts.length; i++) {
             var lines = parts[i].split("\n");
-            if (compare(convert(lines[0]), convert(lines[1])) == -1) result += i + 1;
+            if (compare(parse(lines[0]), parse(lines[1])) == -1) result += i + 1;
         }
         return result;
     }
@@ -87,7 +99,7 @@ public class Day13 extends Day {
         List<String> items = new ArrayList<>(Arrays.asList(parts));
         items.add("[[2]]");
         items.add("[[6]]");
-        Collections.sort(items, (a,b) -> compare(convert(a), convert(b)));
+        Collections.sort(items, (a,b) -> compare(parse(a), parse(b)));
         return (items.indexOf("[[2]]")+1) * (items.indexOf("[[6]]")+1);
     }
 }
