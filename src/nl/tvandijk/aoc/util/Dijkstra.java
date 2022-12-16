@@ -15,7 +15,7 @@ public class Dijkstra<N> {
         this.graph = graph;
     }
 
-    public int determineShortestPath(N source, N target) {
+    public int distance(N source, N target) {
         var v = distances.get(Pair.of(source, target));
         if (v != null) return v;
 

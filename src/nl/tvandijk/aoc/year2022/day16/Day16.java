@@ -1,13 +1,17 @@
 package nl.tvandijk.aoc.year2022.day16;
 
-import java.util.*;
 import nl.tvandijk.aoc.common.Day;
-import nl.tvandijk.aoc.util.Dijkstra;
+import nl.tvandijk.aoc.util.FloydWarshall;
 import nl.tvandijk.aoc.util.Graph;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class Day16 extends Day {
     private final Graph<Integer> graph = new Graph<>();
-    private final Dijkstra<Integer> dijkstra = new Dijkstra<>(graph);
+    private final FloydWarshall<Integer> fw = new FloydWarshall<>(graph);
     private final Map<String, Integer> valves = new HashMap<>();
     private int[] rates;
 
@@ -28,38 +32,60 @@ public class Day16 extends Day {
         }
     }
 
-    private int solve(int loc, boolean[] open, int time) {
+    record State(int loc, boolean[] open, int time) {
+        State(int loc, boolean[] open, int time) {
+            this.loc = loc;
+            this.open = Arrays.copyOf(open, open.length);
+            this.time = time;
+        }
+
+        public static State of(int loc, boolean[] open, int time) {
+            return new State(loc, open, time);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof State state)) return false;
+            return loc == state.loc && time == state.time && Arrays.equals(open, state.open);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(loc, time);
+            result = 31 * result + Arrays.hashCode(open);
+            return result;
+        }
+    }
+
+    private Map<State, Integer> cache = new HashMap<>();
+
+    private int solve(int loc, boolean[] open, int time, boolean elephant) {
+        if (!elephant) {
+            var v = State.of(loc, open, time);
+            var i = cache.get(v);
+            if (i != null) return i;
+        }
         int best = 0;
         for (int i = 0; i < open.length; i++) {
             if (!open[i]) {
                 // reach it
-                int dist = loc == i ? 1 : dijkstra.determineShortestPath(loc, i) + 1;
+                int dist = loc == i ? 1 : fw.distance(loc, i) + 1;
                 if (dist >= time) continue; // don't bother
                 open[i] = true;
-                int res = solve(i, open, time-dist) + rates[i] * (time-dist);
+                int res = solve(i, open, time-dist, elephant) + rates[i] * (time-dist);
                 open[i] = false;
                 if (res > best) best = res;
             }
         }
-        return best;
-    }
-
-    private int solveWithElephant(int loc, int i, boolean[] openme, boolean[] openel, int time) {
-        if (i == openme.length) {
-            return solve(loc, openme, time) + solve(loc, openel, time);
-        } else if (!openme[i]) {
-            // let me do it
-            openel[i] = true;
-            int res1 = solveWithElephant(loc, i+1, openme, openel, time);
-            openel[i] = false;
-            // let el do it
-            openme[i] = true;
-            int res2 = solveWithElephant(loc, i+1, openme, openel, time);
-            openme[i] = false;
-            return Math.max(res1, res2);
+        if (elephant) {
+            int res = solve(valves.get("AA"), open, 26, false);
+            if (res > best) best = res;
         } else {
-            return solveWithElephant(loc, i+1, openme, openel, time);
+            var v = State.of(loc, open, time);
+            cache.put(v, best);
         }
+        return best;
     }
 
     @Override
@@ -71,7 +97,7 @@ public class Day16 extends Day {
         for (int i = 0; i < vlen; i++) {
             if (rates[i] == 0) open[i] = true;
         }
-        return solve(loc, open, 30);
+        return solve(loc, open, 30, false);
     }
 
     @Override
@@ -83,7 +109,6 @@ public class Day16 extends Day {
         for (int i = 0; i < vlen; i++) {
             if (rates[i] == 0) open[i] = true;
         }
-        var openel = Arrays.copyOf(open, open.length);
-        return solveWithElephant(loc, 0, open, openel, 26);
+        return solve(loc, open, 26, true);
     }
 }
