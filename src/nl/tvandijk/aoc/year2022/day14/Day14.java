@@ -35,7 +35,7 @@ public class Day14 extends Day {
                 }
             }
         }
-        int lowest = occupied.stream().mapToInt(p -> p.y).max().getAsInt();
+        int lowest = occupied.stream().mapToInt(p -> (int)p.y).max().getAsInt();
         for (int i = 0; ; i++) {
             var p = Point.of(500,0);
             while (true) {
@@ -80,7 +80,7 @@ public class Day14 extends Day {
             }
         }
         // find floor
-        int floor = 1 + occupied.stream().mapToInt(p -> p.y).max().getAsInt();
+        int floor = 1 + occupied.stream().mapToInt(p -> (int)p.y).max().getAsInt();
         for (int i = 0; ; i++) {
             var p = Point.of(500,0);
             if (occupied.contains(p)) {

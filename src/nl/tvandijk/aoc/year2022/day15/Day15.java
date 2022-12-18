@@ -8,19 +8,19 @@ import nl.tvandijk.aoc.util.Point;
 public class Day15 extends Day {
     static class Sensor {
         Point location;
-        int distance;
+        long distance;
 
         public Sensor(Point location, Point beacon) {
             this.location = location;
             distance = Math.abs(beacon.y-location.y) + Math.abs(beacon.x-location.x);
         }
 
-        public Pair<Integer, Integer> coverage(int y) {
-            var d = distance - Math.abs(y-location.y);
+        public Pair<Integer, Integer> coverage(long y) {
+            long d = distance - Math.abs(y-location.y);
             if (d < 0) return null;
-            int from = location.x - d;
-            int to = location.x + d;
-            return Pair.of(from, to);
+            long from = location.x - d;
+            long to = location.x + d;
+            return Pair.of((int)from, (int)to);
         }
     }
 
@@ -89,7 +89,7 @@ public class Day15 extends Day {
         }
         int b = 0;
         for (var beacon : beacons) {
-            if (beacon.y == 2000000 && lc.covers(beacon.x)) b++;
+            if (beacon.y == 2000000 && lc.covers((int) beacon.x)) b++;
         }
         return lc.size() - b;
     }

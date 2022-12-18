@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class Point {
-    public final int x;
-    public final int y;
+    public final long x;
+    public final long y;
 
-    private Point(int x, int y) {
+    private Point(long x, long y) {
         this.x = x;
         this.y = y;
     }
@@ -17,11 +17,11 @@ public class Point {
         this(other.x, other.y);
     }
 
-    public static Point of(int x, int y) {
+    public static Point of(long x, long y) {
         return new Point(x, y);
     }
 
-    public Point delta(int dx, int dy) {
+    public Point delta(long dx, long dy) {
         return new Point(x+dx, y+dy);
     }
 
@@ -40,9 +40,9 @@ public class Point {
         return res;
     }
 
-    public boolean inside(int minx, int miny, int width, int height) {
-        int maxx = minx+width;
-        int maxy = miny+height;
+    public boolean inside(long minx, long miny, long width, long height) {
+        long maxx = minx+width;
+        long maxy = miny+height;
         return this.x >= minx && this.x < maxx && this.y >= miny && this.y < maxy;
     }
 

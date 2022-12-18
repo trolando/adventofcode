@@ -12,11 +12,11 @@ public class Day9 extends Day {
     }
 
     private Point follow(Point head, Point tail) {
-        int cx = head.x-tail.x;
-        int cy = head.y-tail.y;
+        long cx = head.x-tail.x;
+        long cy = head.y-tail.y;
         if (cx > 1 || cx < -1 || cy > 1 || cy < -1) {
-            int x = tail.x;
-            int y = tail.y;
+            long x = tail.x;
+            long y = tail.y;
             if (cy == 0) {
                 if (cx > 1) x++;
                 else x--;

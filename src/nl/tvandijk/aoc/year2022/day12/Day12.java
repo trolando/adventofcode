@@ -50,7 +50,7 @@ public class Day12 extends Day {
             for (var p : cur.adjacent(false)) {
                 if (!p.inside(0, 0, width, height)) continue;
                 if (distances.containsKey(p)) continue;
-                if (map[p.x + p.y * width] - map[cur.x + cur.y * width] > 1) continue;
+                if (map[(int)p.x + (int)p.y * width] - map[(int)cur.x + (int)cur.y * width] > 1) continue;
                 distances.put(p, d+1);
                 q.add(p);
             }
@@ -71,13 +71,13 @@ public class Day12 extends Day {
             for (var p : cur.adjacent(false)) {
                 if (!p.inside(0, 0, width, height)) continue;
                 if (distances.containsKey(p)) continue;
-                if (map[cur.x + cur.y * width] - map[p.x + p.y * width] > 1) continue;
+                if (map[(int)cur.x + (int)cur.y * width] - map[(int)p.x + (int)p.y * width] > 1) continue;
                 distances.put(p, d+1);
                 q.add(p);
             }
         }
         return distances.entrySet().stream()
-                .filter(e -> map[e.getKey().x + e.getKey().y*width] == 0)
+                .filter(e -> map[(int)e.getKey().x + (int)e.getKey().y*width] == 0)
                 .mapToInt(e -> e.getValue())
                 .min().getAsInt();
     }
