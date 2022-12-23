@@ -21,46 +21,40 @@ public class Day21 extends Day {
         }
     }
 
-    Map<String, Op> ops = new HashMap<>();
-    Map<String, Long> values = new HashMap<>();
+    private Map<String, Op> ops = new HashMap<>();
+    private Map<String, Long> values = new HashMap<>();
 
-    long compute(String s, Map<String, Long> values, Map<String, Op> ops) {
+    private long compute(String s) {
         var v = values.get(s);
         if (v != null) return v;;
         var o = ops.get(s);
-        var vl = compute(o.left, values, ops);
-        var vr = compute(o.right, values, ops);
+        var vl = compute(o.left);
+        var vr = compute(o.right);
         switch (o.op) {
-            case '+' -> values.put(s, vl+vr);
-            case '/' -> values.put(s, vl/vr);
-            case '*' -> values.put(s, vl*vr);
-            case '-' -> values.put(s, vl-vr);
+            case '+' -> values.put(s, vl + vr);
+            case '/' -> values.put(s, vl / vr);
+            case '*' -> values.put(s, vl * vr);
+            case '-' -> values.put(s, vl - vr);
         }
         return values.get(s);
     }
 
-    Map<String, Op> forHuman = new HashMap<>();
-
-    private boolean findHuman(String s) {
+    private boolean findHuman(String s, Map<String, Op> forHuman) {
         if (s.equals("humn")) return true;
-        var v = values.get(s);
-        if (v != null) return false; // not sure if needed
+        if (values.containsKey(s)) return false;
         var o = ops.get(s);
-        var l = findHuman(o.left);
-        var r = findHuman(o.right);
+        var l = findHuman(o.left, forHuman);
+        var r = findHuman(o.right, forHuman);
         if (s.equals("root")) {
-            if (l && r) {
+            if (l == r) {
                 System.out.println("huh");
             } else if (l) {
                 values.put(o.left, values.get(o.right));
             } else if (r) {
                 values.put(o.right, values.get(o.left));
-            } else {
-                System.out.println("huh");
             }
             return true;
-        }
-        if (l && r) {
+        } else if (l && r) {
             System.out.println("huh");
             return true;
         } else if (l) {
@@ -99,14 +93,16 @@ public class Day21 extends Day {
     @Override
     protected Object part1() {
         // part 1
-        return compute("root", values, ops);
+        return compute("root");
     }
 
     @Override
     protected Object part2() {
         // part 2
         values.remove("humn");
-        findHuman("root");
-        return compute("humn", values, forHuman);
+        Map<String, Op> forHuman = new HashMap<>();
+        findHuman("root", forHuman);
+        ops = forHuman;
+        return compute("humn");
     }
 }

@@ -27,6 +27,14 @@ public class Point3 {
         return new Point3(x+dx, y+dy, z+dz);
     }
 
+    public Point3 delta(Point3 d) {
+        return new Point3(x+d.x, y+d.y, z+d.z);
+    }
+
+    public Point3 reverse() {
+        return new Point3(-x, -y, -z);
+    }
+
     public List<Point3> adjacent(boolean diag) {
         var res = new ArrayList<Point3>();
         res.add(delta(-1, 0, 0));
