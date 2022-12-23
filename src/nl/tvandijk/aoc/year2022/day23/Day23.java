@@ -14,23 +14,23 @@ public class Day23 extends Day {
         int y = 0;
         for (var line : lines) {
             for (int x = 0; x < line.length(); x++) {
-                if (line.charAt(x) == '#') elves.put(Point.of(x, y), new Object());
+                if (line.charAt(x) == '#') elves.add(Point.of(x, y));
             }
             y++;
         }
     }
 
-    Map<Point, Object> elves = new HashMap<>();
+    private Set<Point> elves = new HashSet<>();
 
-    void printState() {
+    private void printState() {
         // show state
-        var minx = elves.keySet().stream().mapToLong(p -> p.x).min().orElse(0);
-        var maxx = elves.keySet().stream().mapToLong(p -> p.x).max().orElse(0);
-        var miny = elves.keySet().stream().mapToLong(p -> p.y).min().orElse(0);
-        var maxy = elves.keySet().stream().mapToLong(p -> p.y).max().orElse(0);
+        var minx = elves.stream().mapToLong(p -> p.x).min().orElse(0);
+        var maxx = elves.stream().mapToLong(p -> p.x).max().orElse(0);
+        var miny = elves.stream().mapToLong(p -> p.y).min().orElse(0);
+        var maxy = elves.stream().mapToLong(p -> p.y).max().orElse(0);
         for (long y = miny; y <= maxy; y++) {
             for (long x = minx; x <= maxx; x++) {
-                if (elves.containsKey(Point.of(x, y))) System.out.print("#");
+                if (elves.contains(Point.of(x, y))) System.out.print("#");
                 else System.out.print(".");
             }
             System.out.println();
@@ -38,51 +38,50 @@ public class Day23 extends Day {
         System.out.println();
     }
 
-    boolean round(int i) {
-        Map<Point, List<Pair<Object, Point>>> proposals = new HashMap<>();
-        for (var e : elves.entrySet()) {
-            var loc = e.getKey();
-            var elf = e.getValue();
-
+    private boolean round(int i) {
+        Map<Point, List<Point>> proposals = new HashMap<>();
+        for (var loc : elves) {
             boolean moves = false;
-            for (var p : loc.adjacent(true)) if (elves.containsKey(p)) moves = true;
+            for (var p : loc.adjacent(true)) {
+                if (elves.contains(p)) {
+                    moves = true;
+                    break;
+                }
+            }
             if (!moves) continue;
 
             for (int d = 0; d < 4; d++) {
                 int dir = (i+d)%4;
                 if (dir == 0) {
-                    if (!elves.containsKey(loc.delta(-1, -1)) &&
-                            !elves.containsKey(loc.delta(0, -1)) &&
-                            !elves.containsKey(loc.delta(1, -1))) {
+                    if (!elves.contains(loc.delta(-1, -1)) &&
+                            !elves.contains(loc.delta(0, -1)) &&
+                            !elves.contains(loc.delta(1, -1))) {
                         var to = loc.delta(0, -1);
-                        proposals.computeIfAbsent(to, s -> new ArrayList<>()).add(Pair.of(elf, loc));
+                        proposals.computeIfAbsent(to, s -> new ArrayList<>()).add(loc);
                         break;
                     }
-                }
-                if (dir == 1) {
-                    if (!elves.containsKey(loc.delta(-1, 1)) &&
-                            !elves.containsKey(loc.delta(0, 1)) &&
-                            !elves.containsKey(loc.delta(1, 1))) {
+                } else if (dir == 1) {
+                    if (!elves.contains(loc.delta(-1, 1)) &&
+                            !elves.contains(loc.delta(0, 1)) &&
+                            !elves.contains(loc.delta(1, 1))) {
                         var to = loc.delta(0, 1);
-                        proposals.computeIfAbsent(to, s -> new ArrayList<>()).add(Pair.of(elf, loc));
+                        proposals.computeIfAbsent(to, s -> new ArrayList<>()).add(loc);
                         break;
                     }
-                }
-                if (dir == 2) {
-                    if (!elves.containsKey(loc.delta(-1, -1)) &&
-                            !elves.containsKey(loc.delta(-1, 0)) &&
-                            !elves.containsKey(loc.delta(-1, 1))) {
+                } else if (dir == 2) {
+                    if (!elves.contains(loc.delta(-1, -1)) &&
+                            !elves.contains(loc.delta(-1, 0)) &&
+                            !elves.contains(loc.delta(-1, 1))) {
                         var to = loc.delta(-1, 0);
-                        proposals.computeIfAbsent(to, s -> new ArrayList<>()).add(Pair.of(elf, loc));
+                        proposals.computeIfAbsent(to, s -> new ArrayList<>()).add(loc);
                         break;
                     }
-                }
-                if (dir == 3) {
-                    if (!elves.containsKey(loc.delta(1, -1)) &&
-                            !elves.containsKey(loc.delta(1, 0)) &&
-                            !elves.containsKey(loc.delta(1, 1))) {
+                } else if (dir == 3) {
+                    if (!elves.contains(loc.delta(1, -1)) &&
+                            !elves.contains(loc.delta(1, 0)) &&
+                            !elves.contains(loc.delta(1, 1))) {
                         var to = loc.delta(1, 0);
-                        proposals.computeIfAbsent(to, s -> new ArrayList<>()).add(Pair.of(elf, loc));
+                        proposals.computeIfAbsent(to, s -> new ArrayList<>()).add(loc);
                         break;
                     }
                 }
@@ -93,9 +92,8 @@ public class Day23 extends Day {
         for (var prop : proposals.entrySet()) {
             var l = prop.getValue();
             if (l.size() == 1) {
-                var ll = l.get(0);
-                elves.remove(ll.b);
-                elves.put(prop.getKey(), ll.a);
+                elves.remove(l.get(0));
+                elves.add(prop.getKey());
                 moved = true;
             }
         }
@@ -110,10 +108,10 @@ public class Day23 extends Day {
         }
 //        printState();
 
-        var minx = elves.keySet().stream().mapToLong(p -> p.x).min().orElse(0);
-        var maxx = elves.keySet().stream().mapToLong(p -> p.x).max().orElse(0);
-        var miny = elves.keySet().stream().mapToLong(p -> p.y).min().orElse(0);
-        var maxy = elves.keySet().stream().mapToLong(p -> p.y).max().orElse(0);
+        var minx = elves.stream().mapToLong(p -> p.x).min().orElse(0);
+        var maxx = elves.stream().mapToLong(p -> p.x).max().orElse(0);
+        var miny = elves.stream().mapToLong(p -> p.y).min().orElse(0);
+        var maxy = elves.stream().mapToLong(p -> p.y).max().orElse(0);
 
         return (maxx-minx+1) * (maxy-miny+1) - elves.size();
     }
