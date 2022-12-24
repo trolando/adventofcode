@@ -46,10 +46,12 @@ public class Day24 extends Day {
     }
 
     boolean isWall(Point p) {
-        if (p.x == 0) return true;
-        if (p.x == width-1) return true;
+        if (p.x <= 0) return true;
+        if (p.x >= width-1) return true;
         if (p.y == 0 && p.x != 1) return true;
+        if (p.y < 0) return true;
         if (p.y == height-1 && p.x != width-2) return true;
+        if (p.y >= height) return true;
         return false;
     }
 
@@ -100,19 +102,18 @@ public class Day24 extends Day {
 //            printMap(blizzards, positions);
 
             minute++;
-            var nextBlizzards = nextBlizzards(blizzards);
+            blizzards = nextBlizzards(blizzards);
             Set<Point> next = new HashSet<>();
             for (var pos : positions) {
-                if (!nextBlizzards.containsKey(pos)) next.add(pos); // wait
+                if (!blizzards.containsKey(pos)) next.add(pos); // wait
                 for (var adj : pos.adjacent(false)) {
-                    if (!isWall(adj) && !nextBlizzards.containsKey(adj)) next.add(adj);
+                    if (!isWall(adj) && !blizzards.containsKey(adj)) next.add(adj);
                 }
             }
             if (next.contains(target)) {
                 return minute;
             }
             positions = next;
-            blizzards = nextBlizzards;
         }
     }
 
@@ -147,12 +148,12 @@ public class Day24 extends Day {
 //            printMap(blizzards, positions);
 
             minute++;
-            var nextBlizzards = nextBlizzards(blizzards);
+            blizzards = nextBlizzards(blizzards);
             Set<Point> next = new HashSet<>();
             for (var pos : positions) {
-                if (!nextBlizzards.containsKey(pos)) next.add(pos); // wait
+                if (!blizzards.containsKey(pos)) next.add(pos); // wait
                 for (var adj : pos.adjacent(false)) {
-                    if (!isWall(adj) && !nextBlizzards.containsKey(adj)) next.add(adj);
+                    if (!isWall(adj) && !blizzards.containsKey(adj)) next.add(adj);
                 }
             }
             if (next.contains(targets[goal])) {
@@ -160,10 +161,8 @@ public class Day24 extends Day {
                 next.clear();
                 next.add(targets[goal]);
                 goal++;
-                System.out.println("Reached goal " + goal);
             }
             positions = next;
-            blizzards = nextBlizzards;
         }
     }
 }
