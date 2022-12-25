@@ -14,11 +14,7 @@ public class Day25 extends Day {
         // part 1
         long sum = 0;
         for (var line : lines) {
-            long l = 0;
-            for (var c : line.toCharArray()) {
-                l = 5 * l + "=-0123".indexOf(c) - 2;
-            }
-            sum += l;
+            sum += line.chars().mapToLong("=-0123"::indexOf).reduce(0L, (a, b) -> 5 * a + b - 2);
         }
         String ans = "";
         while (sum != 0) {
