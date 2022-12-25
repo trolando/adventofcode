@@ -2,6 +2,7 @@ package nl.tvandijk.aoc.year%Year%.day%Day%;
 
 import java.util.*;
 import nl.tvandijk.aoc.common.Day;
+import nl.tvandijk.aoc.util.*;
 
 public class Day%Day% extends Day {
     @Override

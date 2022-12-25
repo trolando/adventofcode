@@ -9,6 +9,18 @@ public class Day24 extends Day {
     protected void processInput(String fileContents) {
         // process the input
         super.processInput(fileContents);
+        width = lines[0].trim().length();
+        height = lines.length;
+        int y=0;
+        for (var line : lines) {
+            for (int x = 0; x < line.length(); x++) {
+                if (line.charAt(x) == '^') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(0);
+                if (line.charAt(x) == '>') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(1);
+                if (line.charAt(x) == 'v') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(2);
+                if (line.charAt(x) == '<') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(3);
+            }
+            y++;
+        }
     }
 
     int width;
@@ -80,21 +92,9 @@ public class Day24 extends Day {
     @Override
     protected Object part1() {
         // part 1
-        width = lines[0].trim().length();
-        height = lines.length;
-        int y=0;
-        for (var line : lines) {
-            for (int x = 0; x < line.length(); x++) {
-                if (line.charAt(x) == '^') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(0);
-                if (line.charAt(x) == '>') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(1);
-                if (line.charAt(x) == 'v') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(2);
-                if (line.charAt(x) == '<') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(3);
-            }
-            y++;
-        }
         // go from (1,0) to (width-1,height-1)
-        Set<Point> positions = new HashSet<>();
         int minute = 0;
+        Set<Point> positions = new HashSet<>();
         positions.add(Point.of(1,0));
         Point target = Point.of(width-2, height-1);
         while (true) {
@@ -125,21 +125,9 @@ public class Day24 extends Day {
     @Override
     protected Object part2() {
         // part 2
-        width = lines[0].trim().length();
-        height = lines.length;
-        int y=0;
-        for (var line : lines) {
-            for (int x = 0; x < line.length(); x++) {
-                if (line.charAt(x) == '^') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(0);
-                if (line.charAt(x) == '>') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(1);
-                if (line.charAt(x) == 'v') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(2);
-                if (line.charAt(x) == '<') blizzards.computeIfAbsent(Point.of(x, y), s->new ArrayList<>()).add(3);
-            }
-            y++;
-        }
         // go from (1,0) to (width-1,height-1)
-        Set<Point> positions = new HashSet<>();
         int minute = 0;
+        Set<Point> positions = new HashSet<>();
         positions.add(Point.of(1,0));
         Point[] targets = new Point[] { Point.of(width-2, height-1), Point.of(1,0), Point.of(width-2, height-1) };
         int goal = 0;
