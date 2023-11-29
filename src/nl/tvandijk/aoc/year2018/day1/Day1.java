@@ -1,16 +1,11 @@
 package nl.tvandijk.aoc.year2018.day1;
 
-import java.util.*;
 import nl.tvandijk.aoc.common.Day;
-import nl.tvandijk.aoc.util.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class Day1 extends Day {
-    @Override
-    protected void processInput(String fileContents) {
-        // process the input
-        super.processInput(fileContents);
-    }
-
     @Override
     protected Object part1() {
         // part 1
@@ -35,7 +30,7 @@ public class Day1 extends Day {
                 if (l.isBlank()) continue;
                 if (l.startsWith("-")) freq -= Integer.parseInt(l.substring(1));
                 else if (l.startsWith("+")) freq += Integer.parseInt(l.substring(1));
-                else throw new RuntimeException("Invalid input: " + l);
+                else throw new AssertionError("Invalid input: " + l);
                 if (seen.contains(freq)) return freq;
                 seen.add(freq);
             }

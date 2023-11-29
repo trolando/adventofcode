@@ -14,11 +14,14 @@ import java.util.Scanner;
 public class Setup {
     private static void createTemplate(int year, int day) throws IOException {
         Path classFilePath = Paths.get(String.format("src/nl/tvandijk/aoc/year%s/day%d/Day%d.java", year, day, day));
-        classFilePath.getParent().toFile().mkdirs();
+        if (!classFilePath.getParent().toFile().mkdirs()) {
+            System.out.println("Could not create directory for class file!");
+            return;
+        }
         if (!Files.exists(classFilePath)) {
             String template = Files.readString(Path.of("src/nl/tvandijk/aoc/setup/Day.txt"));
-            template = template.replaceAll("%Year%", String.valueOf(year));
-            template = template.replaceAll("%Day%", String.valueOf(day));
+            template = template.replace("%Year%", String.valueOf(year));
+            template = template.replace("%Day%", String.valueOf(day));
             Files.writeString(classFilePath, template);
             System.out.printf("Generated class file at: %s", classFilePath.toAbsolutePath());
         } else {
@@ -28,21 +31,29 @@ public class Setup {
 
     private static void downloadInput(String sessionToken, int year, int day) throws IOException, InterruptedException {
         URI uri = URI.create(String.format("https://adventofcode.com/%d/day/%d/input", year, day));
-        var httpClient = HttpClient.newHttpClient();
-        var req = HttpRequest.newBuilder(uri).GET().header("cookie", String.format("session=%s", sessionToken)).build();
+        try (var httpClient = HttpClient.newHttpClient()) {
+            var req = HttpRequest.newBuilder(uri).GET().header("cookie", String.format("session=%s", sessionToken)).build();
 
-        // Create the input.txt file if it does not yet exist
-        File file = Paths.get(String.format("src/nl/tvandijk/aoc/year%d/day%d/input.txt", year, day)).toFile();
-        file.getParentFile().mkdirs();
-        if (!file.exists()) {
-            httpClient.send(req, HttpResponse.BodyHandlers.ofFile(file.toPath()));
-        } else {
-            System.out.println("File input.txt already exists!");
+            // Create the input.txt file if it does not yet exist
+            File file = Paths.get(String.format("src/nl/tvandijk/aoc/year%d/day%d/input.txt", year, day)).toFile();
+            if (!file.getParentFile().mkdirs()) {
+                System.out.println("Could not create directory for input.txt!");
+                return;
+            }
+            if (!file.exists()) {
+                httpClient.send(req, HttpResponse.BodyHandlers.ofFile(file.toPath()));
+            } else {
+                System.out.println("File input.txt already exists!");
+                return;
+            }
+
+            // Create the example.txt file if it does not yet exist
+            File exampleFile = new File(file.getParent(), "example.txt");
+            if (!exampleFile.createNewFile()) {
+                System.out.println("File example.txt could not be created!");
+                return;
+            }
         }
-
-        // Create the example.txt file if it does not yet exist
-        File exampleFile = new File(file.getParent(), "example.txt");
-        exampleFile.createNewFile();
 
         // Write link to stdout
         System.out.printf("Link to puzzle: https://adventofcode.com/%d/day/%d%n", year, day);
