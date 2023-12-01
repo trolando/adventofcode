@@ -14,10 +14,7 @@ import java.util.Scanner;
 public class Setup {
     private static void createTemplate(int year, int day) throws IOException {
         Path classFilePath = Paths.get(String.format("src/nl/tvandijk/aoc/year%s/day%d/Day%d.java", year, day, day));
-        if (!classFilePath.getParent().toFile().mkdirs()) {
-            System.out.println("Could not create directory for class file!");
-            return;
-        }
+        classFilePath.getParent().toFile().mkdirs();
         if (!Files.exists(classFilePath)) {
             String template = Files.readString(Path.of("src/nl/tvandijk/aoc/setup/Day.txt"));
             template = template.replace("%Year%", String.valueOf(year));
@@ -36,10 +33,7 @@ public class Setup {
 
             // Create the input.txt file if it does not yet exist
             File file = Paths.get(String.format("src/nl/tvandijk/aoc/year%d/day%d/input.txt", year, day)).toFile();
-            if (!file.getParentFile().mkdirs()) {
-                System.out.println("Could not create directory for input.txt!");
-                return;
-            }
+            file.getParentFile().mkdirs();
             if (!file.exists()) {
                 httpClient.send(req, HttpResponse.BodyHandlers.ofFile(file.toPath()));
             } else {
