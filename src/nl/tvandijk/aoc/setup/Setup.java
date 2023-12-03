@@ -34,12 +34,7 @@ public class Setup {
             // Create the input.txt file if it does not yet exist
             File file = Paths.get(String.format("src/nl/tvandijk/aoc/year%d/day%d/input.txt", year, day)).toFile();
             file.getParentFile().mkdirs();
-            if (!file.exists()) {
-                httpClient.send(req, HttpResponse.BodyHandlers.ofFile(file.toPath()));
-            } else {
-                System.out.println("File input.txt already exists!");
-                return;
-            }
+            httpClient.send(req, HttpResponse.BodyHandlers.ofFile(file.toPath()));
 
             // Create the example.txt file if it does not yet exist
             File exampleFile = new File(file.getParent(), "example.txt");
