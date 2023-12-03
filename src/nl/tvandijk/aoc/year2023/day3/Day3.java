@@ -1,0 +1,120 @@
+package nl.tvandijk.aoc.year2023.day3;
+
+import java.util.*;
+import nl.tvandijk.aoc.common.Day;
+import nl.tvandijk.aoc.util.*;
+
+public class Day3 extends Day {
+    private boolean isSymbol(int x, int y) {
+        if (x < 0) return false;
+        if (y < 0) return false;
+        if (x >= lines.length) return false;
+        var line = lines[x];
+        if (y >= line.length()) return false;
+        char ch = line.charAt(y);
+        if (ch == '.') return false;
+        return !Character.isDigit(ch);
+    }
+
+    private boolean findSymbol(int x, int y, int len) {
+        // get length of digit
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j < len + 1; j++) {
+                if (isSymbol(x+i, y+j)) return true;
+            }
+        }
+        return false;
+    }
+
+    private final Map<Point, List<Integer>> gears = new HashMap<>();
+
+    private void checkGear(int x, int y, int val) {
+        if (x < 0) return;
+        if (y < 0) return;
+        if (x >= lines.length) return;
+        var line = lines[x];
+        if (y >= line.length()) return;
+        char ch = line.charAt(y);
+        if (ch != '*') return;
+        gears.computeIfAbsent(Point.of(x, y), k -> new ArrayList<>()).add(val);
+    }
+
+    private void findGears(int x, int y, int val) {
+        checkGear(x-1, y-1, val);
+        checkGear(x, y-1, val);
+        checkGear(x+1, y-1, val);
+        for (int i = y; i < lines[0].length(); i++) {
+            if (!Character.isDigit(lines[x].charAt(i))) {
+                checkGear(x-1, i, val);
+                checkGear(x, i, val);
+                checkGear(x+1, i, val);
+                return;
+            } else {
+                checkGear(x - 1, i, val);
+                checkGear(x + 1, i, val);
+            }
+        }
+    }
+
+    @Override
+    protected Object part1() {
+        // part 1
+        int sum = 0;
+        for (int i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            for (int j = 0; j < line.length(); j++) {
+                if (Character.isDigit(line.charAt(j))) {
+                    // complete digit
+                    int val = 0;
+                    int len = 0;
+                    for (int k = j; k < line.length(); k++) {
+                        if (!Character.isDigit(line.charAt(k))) break;
+                        len++;
+                        val *= 10;
+                        val += line.charAt(k) - '0';
+                    }
+                    if (findSymbol(i, j, len)) sum += val;
+                    j += len-1;
+                }
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    protected Object part2() {
+        // part 2
+        for (int i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            for (int j = 0; j < line.length(); j++) {
+                if (Character.isDigit(line.charAt(j))) {
+                    // complete digit
+                    int val = 0;
+                    int len = 0;
+                    for (int k = j; k < line.length(); k++) {
+                        if (!Character.isDigit(line.charAt(k))) break;
+                        len += 1;
+                        val *= 10;
+                        val += line.charAt(k) - '0';
+                    }
+                    findGears(i, j, val);
+                    j += len-1;
+                }
+            }
+        }
+        // check all gears
+        long sum = 0;
+        for (var e : gears.entrySet()) {
+            var vals = e.getValue();
+            if (vals.size() > 1) {
+                // get sum
+                long res = 1;
+                for (var v : vals) {
+                    res *= v;
+                }
+                sum += res;
+            }
+        }
+        return sum;
+    }
+}
