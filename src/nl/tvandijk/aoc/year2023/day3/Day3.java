@@ -1,6 +1,8 @@
 package nl.tvandijk.aoc.year2023.day3;
 
 import java.util.*;
+import java.util.regex.Pattern;
+
 import nl.tvandijk.aoc.common.Day;
 import nl.tvandijk.aoc.util.*;
 
@@ -56,25 +58,18 @@ public class Day3 extends Day {
         }
     }
 
+    private static final Pattern pat = Pattern.compile("\\d+");
+
     @Override
     protected Object part1() {
         // part 1
         int sum = 0;
         for (int i = 0; i < lines.length; i++) {
-            var line = lines[i];
-            for (int j = 0; j < line.length(); j++) {
-                if (Character.isDigit(line.charAt(j))) {
-                    // complete digit
-                    int val = 0;
-                    int len = 0;
-                    for (int k = j; k < line.length(); k++) {
-                        if (!Character.isDigit(line.charAt(k))) break;
-                        len++;
-                        val *= 10;
-                        val += line.charAt(k) - '0';
-                    }
-                    if (findSymbol(i, j, len)) sum += val;
-                    j += len-1;
+            var matcher = pat.matcher(lines[i]);
+            for (int j = 0; matcher.find(j); j = matcher.end()) {
+                int val = Integer.parseInt(matcher.group(0));
+                if (findSymbol(i, matcher.start(), matcher.group(0).length())) {
+                    sum += val;
                 }
             }
         }
@@ -85,36 +80,14 @@ public class Day3 extends Day {
     protected Object part2() {
         // part 2
         for (int i = 0; i < lines.length; i++) {
-            var line = lines[i];
-            for (int j = 0; j < line.length(); j++) {
-                if (Character.isDigit(line.charAt(j))) {
-                    // complete digit
-                    int val = 0;
-                    int len = 0;
-                    for (int k = j; k < line.length(); k++) {
-                        if (!Character.isDigit(line.charAt(k))) break;
-                        len += 1;
-                        val *= 10;
-                        val += line.charAt(k) - '0';
-                    }
-                    findGears(i, j, val);
-                    j += len-1;
-                }
+            var matcher = pat.matcher(lines[i]);
+            for (int j = 0; matcher.find(j); j = matcher.end()) {
+                int val = Integer.parseInt(matcher.group(0));
+                findGears(i, matcher.start(), val);
             }
         }
-        // check all gears
-        long sum = 0;
-        for (var e : gears.entrySet()) {
-            var vals = e.getValue();
-            if (vals.size() > 1) {
-                // get sum
-                long res = 1;
-                for (var v : vals) {
-                    res *= v;
-                }
-                sum += res;
-            }
-        }
-        return sum;
+        return gears.values().stream().filter(v -> v.size() > 1)
+                .mapToInt(v -> v.stream().reduce(1, (a,b) -> a*b))
+                .sum();
     }
 }
