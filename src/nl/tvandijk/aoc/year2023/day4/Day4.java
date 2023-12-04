@@ -1,6 +1,7 @@
 package nl.tvandijk.aoc.year2023.day4;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import nl.tvandijk.aoc.common.Day;
@@ -12,9 +13,9 @@ public class Day4 extends Day {
         // part 1
         int sum = 0;
         for (var line : lines) {
-            var r = line.split(": ")[1].split(" \\| ");
-            var winning = Arrays.stream(r[0].trim().split("\\s+")).mapToInt(Integer::parseInt).boxed().collect(Collectors.toSet());
-            var have = Arrays.stream(r[1].trim().split("\\s+")).mapToInt(Integer::parseInt).boxed().collect(Collectors.toSet());
+            var r = line.split(":")[1].split("\\|");
+            var winning = Arrays.stream(r[0].trim().split("\\s+")).map(Integer::parseInt).collect(Collectors.toSet());
+            var have = Arrays.stream(r[1].trim().split("\\s+")).map(Integer::parseInt).collect(Collectors.toSet());
             var count = winning.stream().filter(have::contains).count();
             if (count > 0) sum += 1 << (count-1);
         }
@@ -26,9 +27,9 @@ public class Day4 extends Day {
         // part 2
         List<Long> arr = new ArrayList<>();
         for (var line : lines) {
-            var r = line.split(": ")[1].split(" \\| ");
-            var winning = Arrays.stream(r[0].trim().split("\\s+")).mapToInt(Integer::parseInt).boxed().collect(Collectors.toSet());
-            var have = Arrays.stream(r[1].trim().split("\\s+")).mapToInt(Integer::parseInt).boxed().collect(Collectors.toSet());
+            var r = line.split(":")[1].split("\\|");
+            var winning = Arrays.stream(r[0].trim().split("\\s+")).map(Integer::parseInt).collect(Collectors.toSet());
+            var have = Arrays.stream(r[1].trim().split("\\s+")).map(Integer::parseInt).collect(Collectors.toSet());
             var count = winning.stream().filter(have::contains).count();
             arr.add(count);
         }
