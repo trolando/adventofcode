@@ -4,11 +4,6 @@ import nl.tvandijk.aoc.common.Day;
 
 public class Day2 extends Day {
     @Override
-    protected void processInput(String fileContents) {
-        super.processInput(fileContents);
-    }
-
-    @Override
     protected Object part1() {
         int score = 0;
         for (var line : lines) {

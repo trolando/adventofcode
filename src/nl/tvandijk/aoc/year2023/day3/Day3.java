@@ -8,12 +8,7 @@ import nl.tvandijk.aoc.util.*;
 
 public class Day3 extends Day {
     private boolean isSymbol(int x, int y) {
-        if (x < 0) return false;
-        if (y < 0) return false;
-        if (x >= lines.length) return false;
-        var line = lines[x];
-        if (y >= line.length()) return false;
-        char ch = line.charAt(y);
+        char ch = grid.get(y, x);
         if (ch == '.') return false;
         return !Character.isDigit(ch);
     }
@@ -31,14 +26,9 @@ public class Day3 extends Day {
     private final Map<Point, List<Integer>> gears = new HashMap<>();
 
     private void checkGear(int x, int y, int val) {
-        if (x < 0) return;
-        if (y < 0) return;
-        if (x >= lines.length) return;
-        var line = lines[x];
-        if (y >= line.length()) return;
-        char ch = line.charAt(y);
-        if (ch != '*') return;
-        gears.computeIfAbsent(Point.of(x, y), k -> new ArrayList<>()).add(val);
+        if (grid.get(y, x) == '*') {
+            gears.computeIfAbsent(Point.of(x, y), k -> new ArrayList<>()).add(val);
+        }
     }
 
     private void findGears(int x, int y, int val) {

@@ -1,5 +1,7 @@
 package nl.tvandijk.aoc.common;
 
+import nl.tvandijk.aoc.util.Grid;
+
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -27,6 +29,11 @@ public abstract class Day {
     protected String[] lines;
 
     /**
+     * Grid of current input file (fileContents split into lines and tokens)
+     */
+    protected Grid grid;
+
+    /**
      * Default construct initializes inputs to example.txt and input.txt
      */
     public Day() {
@@ -48,6 +55,7 @@ public abstract class Day {
     protected void processInput(String fileContents) {
         this.fileContents = fileContents.replaceAll("\r\n","\n");
         this.lines = this.fileContents.split("\n"); // supports linux/windows, not older mac
+        this.grid = Grid.of(lines);
         this.tokens = this.fileContents.split("\\s+");
     }
 
