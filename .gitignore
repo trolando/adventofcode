@@ -2,3 +2,5 @@
 /out/
 /gen/
 resources/session.token
+
+input.txt
