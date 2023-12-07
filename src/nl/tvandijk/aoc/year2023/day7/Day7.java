@@ -6,33 +6,37 @@ import nl.tvandijk.aoc.common.Day;
 import nl.tvandijk.aoc.util.*;
 
 public class Day7 extends Day {
-    int kindCard(String card) {
-        Map<Character, Integer> map = new HashMap<>();
-        for (char c : card.toCharArray()) {
-            map.put(c, map.getOrDefault(c, 0) + 1);
-        }
-        int[] counts = map.values().stream().mapToInt(Integer::intValue).toArray();
-        Arrays.sort(counts);
-        if (counts.length == 1) return 1;
-        if (counts[1] == 4) return 2;
-        if (counts[1] == 3) return 3;
-        if (counts[2] == 3) return 4;
-        if (counts.length == 3) return 5;
-        if (counts.length == 4) return 6;
-        if (counts.length == 5) return 7;
-        return -1; // should not happen
+    private Map<String, Integer> kindsCache = new HashMap<>();
+
+    private int kindOfCard(String theCard) {
+        return kindsCache.computeIfAbsent(theCard, card -> {
+            Map<Character, Integer> map = new HashMap<>();
+            for (char ch : card.toCharArray()) {
+                map.compute(ch, (k, v) -> v == null ? 1 : v + 1);
+            }
+            int[] counts = map.values().stream().mapToInt(x -> x).toArray();
+            Arrays.sort(counts);
+            if (counts.length == 1) return 1;
+            if (counts[1] == 4) return 2;
+            if (counts[1] == 3) return 3;
+            if (counts[2] == 3) return 4;
+            if (counts.length == 3) return 5;
+            if (counts.length == 4) return 6;
+            if (counts.length == 5) return 7;
+            return -1; // should not happen
+        });
     }
 
-    int compare(String a, String b) {
-        int typeA = kindCard(a);
-        int typeB = kindCard(b);
+    private int compare(String a, String b) {
+        int typeA = kindOfCard(a);
+        int typeB = kindOfCard(b);
         if (typeA > typeB) return -1; // b is stronger
         if (typeA < typeB) return 1;
         for (int i = 0; i < 5; i++) {
-            int idx1 = "23456789TJQKA".indexOf(a.charAt(i));
-            int idx2 = "23456789TJQKA".indexOf(b.charAt(i));
-            if (idx1 < idx2) return -1; // b is stronger
-            if (idx1 > idx2) return 1;
+            int idxA = "23456789TJQKA".indexOf(a.charAt(i));
+            int idxB = "23456789TJQKA".indexOf(b.charAt(i));
+            if (idxA < idxB) return -1; // b is stronger
+            if (idxA > idxB) return 1;
         }
         return 0; // same strength
     }
@@ -54,11 +58,11 @@ public class Day7 extends Day {
     }
 
     int kindCard2(String card) {
-        int bestStrength = kindCard(card);
+        int bestStrength = kindOfCard(card);
         for (int i = 0; i < "23456789TJQKA".length(); i++) {
             var c = card.replace("J", String.valueOf("23456789TJQKA".charAt(i)));
-            if (kindCard(c) < bestStrength) {
-                bestStrength = kindCard(c);
+            if (kindOfCard(c) < bestStrength) {
+                bestStrength = kindOfCard(c);
             }
         }
         return bestStrength;
