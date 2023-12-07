@@ -13,14 +13,14 @@ public class Day7 extends Day {
         }
         int[] counts = map.values().stream().mapToInt(Integer::intValue).toArray();
         Arrays.sort(counts);
-        if (counts[0] == 5) return 1;
+        if (counts.length == 1) return 1;
         if (counts[1] == 4) return 2;
-        if (counts[0] == 2 && counts[1] == 3) return 3;
+        if (counts[1] == 3) return 3;
         if (counts[2] == 3) return 4;
-        if (counts[0] == 1 && counts[1] == 2 && counts[2] == 2) return 5;
+        if (counts.length == 3) return 5;
         if (counts.length == 4) return 6;
         if (counts.length == 5) return 7;
-        throw new RuntimeException(String.format("Unknown card type: %s", card));
+        return -1; // should not happen
     }
 
     int compare(String a, String b) {
