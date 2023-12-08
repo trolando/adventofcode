@@ -40,8 +40,6 @@ public class Day8 extends Day {
         return steps;
     }
 
-    Set<String> seen = new HashSet<>();
-
     @Override
     protected Object part2() {
         // part 2
