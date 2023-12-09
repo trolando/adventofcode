@@ -80,7 +80,14 @@ public class Day8 extends Day {
         for (int i = 1; i < periods.size(); i++) {
             lcm = Util.lcm(lcm, periods.get(i));
         }
-        return lcm;
+        // actually we can also use the Chinese Remainder Theorem
+        ChineseRemainderTheorem crt = new ChineseRemainderTheorem();
+        for (Long period : periods) {
+            crt.addEquation(0, period);
+        }
+        var res = crt.solve();
+        if (res[1] != lcm) throw new IllegalStateException("Wrong answer!");
+        return res[1];
     }
 
     /**

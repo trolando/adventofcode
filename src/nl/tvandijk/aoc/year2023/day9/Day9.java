@@ -36,6 +36,6 @@ public class Day9 extends Day {
             var values = Arrays.stream(l.split(" ")).map(Long::parseLong).toList();
             sum += next(values, true);
         }
-        return sum;   
+        return sum;
     }
 }
