@@ -11,7 +11,6 @@ import java.util.Objects;
 
 public class Day16 extends Day {
     private final Graph<Integer> graph = new Graph<>();
-    private final FloydWarshall<Integer> fw = new FloydWarshall<>(graph);
     private final Map<String, Integer> valves = new HashMap<>();
     private int[] rates;
 
@@ -70,7 +69,7 @@ public class Day16 extends Day {
         for (int i = 0; i < open.length; i++) {
             if (!open[i]) {
                 // reach it
-                int dist = loc == i ? 1 : (int) fw.distance(loc, i) + 1;
+                int dist = loc == i ? 1 : (int) graph.floydWarshall().distance(loc, i) + 1;
                 if (dist >= time) continue; // don't bother
                 open[i] = true;
                 int res = solve(i, open, time-dist, elephant) + rates[i] * (time-dist);

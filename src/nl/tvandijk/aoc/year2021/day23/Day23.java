@@ -1,8 +1,8 @@
 package nl.tvandijk.aoc.year2021.day23;
 
 import nl.tvandijk.aoc.common.Day;
+import nl.tvandijk.aoc.util.Graph;
 import nl.tvandijk.aoc.util.Pair;
-import nl.tvandijk.aoc.util.TransitionSystem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class Day23 extends Day {
     private final static boolean PRINTPATH = false;
-    private final static boolean COUNTALL = false;
+    private final static boolean COUNTALL = true;
 
     // #############
     // #01234567890#  0 to 11
@@ -278,8 +278,8 @@ public class Day23 extends Day {
         pos[18] = read(lines[2].charAt(9));
         pos[19] = read(lines[3].charAt(9));
 
-        var ts = new TransitionSystem<>(State::successors);
-        var result = ts.reachFinal(List.of(new State(pos)), State::isFinal);
+        var graph = new Graph<>(State::successors);
+        var result = graph.reachAny(List.of(new State(pos)), State::isFinal);
 
         if (PRINTPATH) {
             var distance = result.a;
@@ -680,8 +680,8 @@ public class Day23 extends Day {
         pos[26] = 3;
         pos[27] = read(lines[3].charAt(9));
 
-        var ts = new TransitionSystem<>(State2::successors);
-        var result = ts.reachFinal(List.of(new State2(pos)), State2::isFinal);
+        var graph = new Graph<>(State2::successors);
+        var result = graph.reachAny(List.of(new State2(pos)), State2::isFinal);
 
         if (PRINTPATH) {
             var distance = result.a;
@@ -692,7 +692,7 @@ public class Day23 extends Day {
         }
 
         if (COUNTALL) {
-            System.out.println("Total number of states: "+ts.reachAll(List.of(new State2(pos))).size());
+            System.out.println("Total number of states: "+graph.reachAll(List.of(new State2(pos))).size());
         }
 
         return result.a.get(result.b.get(result.b.size()-1));

@@ -1,7 +1,5 @@
 package nl.tvandijk.aoc.util;
 
-import java.util.Arrays;
-
 public class Grid {
     private char def;
     private final char[][] grid;

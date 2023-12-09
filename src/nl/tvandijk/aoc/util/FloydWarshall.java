@@ -34,6 +34,15 @@ public class FloydWarshall<N> {
         }
     }
 
+    /**
+     * Get all distances
+     * @return a map of all distances between two nodes
+     */
+    public Map<Pair<N, N>, Long> getAll() {
+        if (distances.isEmpty()) compute();
+        return distances;
+    }
+
     public long distance(N source, N target) {
         if (distances.isEmpty()) compute();
         var r = distances.get(Pair.of(source, target));
