@@ -70,7 +70,7 @@ public class Day16 extends Day {
         for (int i = 0; i < open.length; i++) {
             if (!open[i]) {
                 // reach it
-                int dist = loc == i ? 1 : fw.distance(loc, i) + 1;
+                int dist = loc == i ? 1 : (int) fw.distance(loc, i) + 1;
                 if (dist >= time) continue; // don't bother
                 open[i] = true;
                 int res = solve(i, open, time-dist, elephant) + rates[i] * (time-dist);

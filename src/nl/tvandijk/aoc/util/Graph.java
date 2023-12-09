@@ -5,13 +5,13 @@ import java.util.Map;
 import java.util.Set;
 
 public class Graph<N> {
-    private final Map<N, Map<N, Integer>> weights = new HashMap<>();
+    private final Map<N, Map<N, Long>> weights = new HashMap<>();
 
-    public Map<N, Integer> getEdges(N node) {
+    public Map<N, Long> getEdges(N node) {
         return weights.computeIfAbsent(node, k -> new HashMap<>());
     }
 
-    public void addEdge(N source, N target, int weight) {
+    public void addEdge(N source, N target, long weight) {
         getEdges(source).put(target, weight);
     }
 
@@ -19,8 +19,8 @@ public class Graph<N> {
         return getEdges(node).keySet();
     }
 
-    public int getWeight(N source, N target) {
-        return getEdges(source).getOrDefault(target, Integer.MAX_VALUE);
+    public long getWeight(N source, N target) {
+        return getEdges(source).getOrDefault(target, Long.MAX_VALUE);
     }
 
     public Set<N> getAllNodes() {

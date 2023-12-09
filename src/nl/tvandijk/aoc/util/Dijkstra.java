@@ -9,21 +9,21 @@ import java.util.Set;
 
 public class Dijkstra<N> {
     private final Graph<N> graph;
-    private Map<Pair<N, N>, Integer> distances = new HashMap<>();
+    private final Map<Pair<N, N>, Long> distances = new HashMap<>();
 
     public Dijkstra(Graph<N> graph) {
         this.graph = graph;
     }
 
-    public int distance(N source, N target) {
+    public long distance(N source, N target) {
         var v = distances.get(Pair.of(source, target));
         if (v != null) return v;
 
-        Map<N, Integer> distance = new HashMap<>();
-        graph.getAllNodes().forEach(node -> distance.put(node, Integer.MAX_VALUE));
-        distance.put(source, 0);
+        Map<N, Long> distance = new HashMap<>();
+        graph.getAllNodes().forEach(node -> distance.put(node, Long.MAX_VALUE));
+        distance.put(source, 0L);
 
-        PriorityQueue<N> queue = new PriorityQueue<>(Comparator.comparingInt(distance::get));
+        PriorityQueue<N> queue = new PriorityQueue<>(Comparator.comparingLong(distance::get));
         queue.add(source);
         Set<N> seen = new HashSet<>();
         seen.add(source);
@@ -32,7 +32,7 @@ public class Dijkstra<N> {
             N top = queue.poll();
 
             for (N adjacent : graph.getAdjacentNodes(top)) {
-                int currentDistance = graph.getWeight(top, adjacent) + distance.get(top);
+                long currentDistance = graph.getWeight(top, adjacent) + distance.get(top);
 
                 if (currentDistance < distance.get(adjacent)) {
                     distance.put(adjacent, currentDistance);

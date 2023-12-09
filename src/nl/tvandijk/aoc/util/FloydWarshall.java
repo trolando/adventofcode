@@ -4,7 +4,7 @@ import java.util.*;
 
 public class FloydWarshall<N> {
     private Graph<N> graph;
-    private Map<Pair<N, N>, Integer> distances = new HashMap<>();
+    private Map<Pair<N, N>, Long> distances = new HashMap<>();
 
     public FloydWarshall(Graph<N> graph) {
         // initialize
@@ -34,7 +34,7 @@ public class FloydWarshall<N> {
         }
     }
 
-    public int distance(N source, N target) {
+    public long distance(N source, N target) {
         if (distances.isEmpty()) compute();
         var r = distances.get(Pair.of(source, target));
         if (r == null) return Integer.MAX_VALUE;
