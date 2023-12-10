@@ -57,22 +57,14 @@ public class Day10 extends Day {
         Set<Point> interior = new HashSet<>();
         for (int y = 0; y < grid.height(); y++) {
             boolean inside = false;
-            char last = 0;
             for (int x = 0; x < grid.width(); x++) {
                 if (loop.contains(Point.of(x, y))) {
                     var ch = grid.get(x, y);
                     if (ch == 'S') {
                         ch = determineS(Point.of(x, y));
                     }
-                    if (ch == '|' || ch == 'L' || ch == 'F') {
+                    if (ch == '|' || ch == 'L' || ch == 'J') {
                         inside = !inside;
-                        last = ch;
-                    } else if (ch == '7') {
-                        if (last != 'L') inside = !inside;
-                        last = ch;
-                    } else if (ch == 'J') {
-                        if (last != 'F') inside = !inside;
-                        last = ch;
                     }
                 } else {
                     if (inside) interior.add(Point.of(x, y));
