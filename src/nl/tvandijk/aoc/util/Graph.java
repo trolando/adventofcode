@@ -2,12 +2,31 @@ package nl.tvandijk.aoc.util;
 
 import java.util.*;
 
+/**
+ * Represents a graph with nodes of type N.
+ */
 public class Graph<N> {
+    /**
+     * A function that determines the successors of a node.
+     */
     public interface SuccessorFunction <N> {
+        /**
+         * Determine the successors of a node.
+         * @param state the node
+         * @return a collection of pairs of adjacent nodes and their weight/distance
+         */
         Collection<Pair<N, Long>> successors(N state);
     }
 
+    /**
+     * A function that determines whether a node is final.
+     */
     public interface IsFinalFunction <S> {
+        /**
+         * Determine whether a node is final.
+         * @param state the node
+         * @return true if the node is final, false otherwise
+         */
         boolean isFinal(S state);
     }
 
@@ -16,14 +35,26 @@ public class Graph<N> {
     private final Dijkstra<N> dijkstra = new Dijkstra<>(this);
     private final FloydWarshall<N> floydWarshall = new FloydWarshall<>(this);
 
+    /**
+     * Create a graph without a successor function.
+     */
     public Graph() {
         this.successorFunction = null;
     }
 
+    /**
+     * Create a graph with a successor function.
+     * @param successorFunction the successor function
+     */
     public Graph(SuccessorFunction<N> successorFunction) {
         this.successorFunction = successorFunction;
     }
 
+    /**
+     * Get all the edges of the node.
+     * @param node the node
+     * @return a map from all adjacent nodes to their weight/distance
+     */
     public Map<N, Long> getEdges(N node) {
         return weights.computeIfAbsent(node, k -> {
             var res = new HashMap<N, Long>();
@@ -35,18 +66,39 @@ public class Graph<N> {
         });
     }
 
+    /**
+     * Add an edge from the source node to the target node with the given weight.
+     * @param source the source node
+     * @param target the target node
+     * @param weight the weight/distance
+     */
     public void addEdge(N source, N target, long weight) {
         getEdges(source).put(target, weight);
     }
 
+    /**
+     * Get all adjacent nodes of the node.
+     * @param node the node
+     * @return a set of all adjacent nodes
+     */
     public Set<N> getAdjacentNodes(N node) {
         return getEdges(node).keySet();
     }
 
+    /**
+     * Get the weight of the edge from the source node to the target node. If there is no edge, return Long.MAX_VALUE.
+     * @param source the source node
+     * @param target the target node
+     * @return the weight/distance
+     */
     public long getWeight(N source, N target) {
         return getEdges(source).getOrDefault(target, Long.MAX_VALUE);
     }
 
+    /**
+     * Get all nodes in the graph.
+     * @return a set of all the nodes
+     */
     public Set<N> getAllNodes() {
         return weights.keySet();
     }
@@ -136,12 +188,10 @@ public class Graph<N> {
             var dv = distance.get(v);
             if (isFinal.isFinal(v)) {
                 List<N> trace = new ArrayList<>();
-                {
-                    var s = v;
-                    while (s != null) {
-                        trace.add(0, s);
-                        s = pred.get(s);
-                    }
+                var s = v;
+                while (s != null) {
+                    trace.addFirst(s);
+                    s = pred.get(s);
                 }
                 return Pair.of(distance, trace);
             }

@@ -56,13 +56,6 @@ public class Point3 {
         return res;
     }
 
-//    public boolean inside(long minx, long miny, long width, long height) {
-//        long maxx = minx+width;
-//        long maxy = miny+height;
-//        return this.x >= minx && this.x < maxx && this.y >= miny && this.y < maxy;
-//    }
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
