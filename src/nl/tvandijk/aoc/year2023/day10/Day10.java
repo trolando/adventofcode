@@ -31,9 +31,8 @@ public class Day10 extends Day {
     @Override
     protected Object part1() {
         // part 1
-        grid.setDefault('X');
-        var res = new Graph<>(this::successor).reachAll(grid.findAll('S'));
-        return res.values().stream().mapToLong(x -> x).max().orElseThrow();
+        var loop = new Graph<>(this::successor).reachAll(grid.findAll('S'));
+        return loop.values().stream().mapToLong(x -> x).max().orElseThrow();
     }
 
     private char determineS(Point p) {
@@ -53,16 +52,14 @@ public class Day10 extends Day {
     @Override
     protected Object part2() {
         // part 2
-        grid.setDefault('X');
-        var graph = new Graph<>(this::successor);
-        var res = graph.reachAll(grid.findAll('S'));
+        var loop = new Graph<>(this::successor).reachAll(grid.findAll('S')).keySet();
 
         Set<Point> interior = new HashSet<>();
         for (int y = 0; y < grid.height(); y++) {
             boolean inside = false;
             char last = 0;
             for (int x = 0; x < grid.width(); x++) {
-                if (res.containsKey(Point.of(x, y))) {
+                if (loop.contains(Point.of(x, y))) {
                     var ch = grid.get(x, y);
                     if (ch == 'S') {
                         ch = determineS(Point.of(x, y));
@@ -83,14 +80,14 @@ public class Day10 extends Day {
             }
         }
 
-        printInterior(res.keySet(), interior);
+        printInterior(loop, interior);
         return interior.size();
     }
 
-    private void printGrid(Set<Point> pipe) {
+    private void printGrid(Set<Point> loop) {
         for (int y = 0; y < grid.height(); y++) {
             for (int x = 0; x < grid.width(); x++) {
-                if (pipe.contains(Point.of(x, y))) {
+                if (loop.contains(Point.of(x, y))) {
                     System.out.print("\033[1;34m"+format(grid.get(x, y))+"\033[m");
                 } else {
                     System.out.print("\033[37m"+format(grid.get(x, y))+"\033[m");
@@ -100,10 +97,10 @@ public class Day10 extends Day {
         }
     }
 
-    private void printInterior(Collection<Point> pipe, Collection<Point> interior) {
+    private void printInterior(Collection<Point> loop, Collection<Point> interior) {
         for (int y = 0; y < grid.height(); y++) {
             for (int x = 0; x < grid.width(); x++) {
-                if (pipe.contains(Point.of(x, y))) {
+                if (loop.contains(Point.of(x, y))) {
                     System.out.print("\033[34m"+format(grid.get(x, y))+"\033[m");
                 } else if (interior.contains(Point.of(x, y))) {
                     System.out.print("\033[1;38;5;46mI\033[m");
