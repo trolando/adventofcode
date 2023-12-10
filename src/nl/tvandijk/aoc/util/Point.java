@@ -40,6 +40,22 @@ public class Point {
         return res;
     }
 
+    public Point left() {
+        return delta(-1, 0);
+    }
+
+    public Point right() {
+        return delta(1, 0);
+    }
+
+    public Point up() {
+        return delta(0, -1);
+    }
+
+    public Point down() {
+        return delta(0, 1);
+    }
+
     public boolean inside(long minx, long miny, long width, long height) {
         long maxx = minx+width;
         long maxy = miny+height;
