@@ -2,11 +2,13 @@ package nl.tvandijk.aoc.year2023.day10;
 
 import nl.tvandijk.aoc.common.Day;
 import nl.tvandijk.aoc.util.Graph;
-import nl.tvandijk.aoc.util.Grid;
 import nl.tvandijk.aoc.util.Pair;
 import nl.tvandijk.aoc.util.Point;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Day10 extends Day {
     private Collection<Pair<Point, Long>> successor(Point p) {
@@ -35,10 +37,10 @@ public class Day10 extends Day {
     }
 
     private char determineS(Point p) {
-        boolean left = "S-7J".contains(String.valueOf(grid.get(p))) && "-FL".contains(String.valueOf(grid.get(p.left())));
-        boolean right = "S-FL".contains(String.valueOf(grid.get(p))) && "-7J".contains(String.valueOf(grid.get(p.right())));
-        boolean down = "S|7F".contains(String.valueOf(grid.get(p))) && "|JL".contains(String.valueOf(grid.get(p.down())));
-        boolean up = "S|JL".contains(String.valueOf(grid.get(p))) && "|7F".contains(String.valueOf(grid.get(p.up())));
+        boolean left = "-FL".contains(String.valueOf(grid.get(p.left())));
+        boolean right = "-7J".contains(String.valueOf(grid.get(p.right())));
+        boolean down = "|JL".contains(String.valueOf(grid.get(p.down())));
+        boolean up = "|7F".contains(String.valueOf(grid.get(p.up())));
         if (left && right) return '-';
         if (up && down) return '|';
         if (left && up) return 'J';
