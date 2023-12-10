@@ -58,16 +58,17 @@ public class Day10 extends Day {
         for (int y = 0; y < grid.height(); y++) {
             boolean inside = false;
             for (int x = 0; x < grid.width(); x++) {
-                if (loop.contains(Point.of(x, y))) {
+                var pt = Point.of(x, y);
+                if (loop.contains(pt)) {
                     var ch = grid.get(x, y);
                     if (ch == 'S') {
-                        ch = determineS(Point.of(x, y));
+                        ch = determineS(pt);
                     }
                     if (ch == '|' || ch == 'L' || ch == 'J') {
                         inside = !inside;
                     }
                 } else {
-                    if (inside) interior.add(Point.of(x, y));
+                    if (inside) interior.add(pt);
                 }
             }
         }
@@ -80,9 +81,9 @@ public class Day10 extends Day {
         for (int y = 0; y < grid.height(); y++) {
             for (int x = 0; x < grid.width(); x++) {
                 if (loop.contains(Point.of(x, y))) {
-                    System.out.print("\033[1;34m"+format(grid.get(x, y))+"\033[m");
+                    System.out.print("\033[1;34m" + format(grid.get(x, y)) + "\033[m");
                 } else {
-                    System.out.print("\033[37m"+format(grid.get(x, y))+"\033[m");
+                    System.out.print("\033[37m" + format(grid.get(x, y)) + "\033[m");
                 }
             }
             System.out.println();
@@ -93,7 +94,7 @@ public class Day10 extends Day {
         for (int y = 0; y < grid.height(); y++) {
             for (int x = 0; x < grid.width(); x++) {
                 if (loop.contains(Point.of(x, y))) {
-                    System.out.print("\033[34m"+format(grid.get(x, y))+"\033[m");
+                    System.out.print("\033[34m" + format(grid.get(x, y)) + "\033[m");
                 } else if (interior.contains(Point.of(x, y))) {
                     System.out.print("\033[1;38;5;46mI\033[m");
                 } else {
