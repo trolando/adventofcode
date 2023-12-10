@@ -4,15 +4,34 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Chinese Remainder Theorem
+ * Chinese Remainder Theorem implementation.
+ * Given a system of equations of the form cx≡a(mod b), this class can solve for x.
+ * @see <a href="https://en.wikipedia.org/wiki/Chinese_remainder_theorem">Wikipedia</a>.
  */
 public class ChineseRemainderTheorem {
     private List<Pair<Long,Long>> system = new ArrayList<>();
 
+    /**
+     * Create an empty Chinese Remainder Theorem object.
+     */
+    public ChineseRemainderTheorem() {
+    }
+
+    /**
+     * Add an equation of the form x≡a(mod b) to the system.
+     * @param a
+     * @param b
+     */
     public void addEquation(long a, long b) {
         system.add(Pair.of(a, b));
     }
 
+    /**
+     * Create a Chinese Remainder Theorem object from a list of equations.
+     * @param a the remainders
+     * @param m the moduli
+     * @return a Chinese Remainder Theorem object
+     */
     public static ChineseRemainderTheorem of(int[] a, int[] m) {
         if (a.length != m.length) throw new IllegalArgumentException();
         ChineseRemainderTheorem crt = new ChineseRemainderTheorem();
@@ -22,6 +41,12 @@ public class ChineseRemainderTheorem {
         return crt;
     }
 
+    /**
+     * Create a Chinese Remainder Theorem object from a list of equations.
+     * @param a the remainders
+     * @param m the moduli
+     * @return a Chinese Remainder Theorem object
+     */
     public static ChineseRemainderTheorem of(long[] a, long[] m) {
         if (a.length != m.length) throw new IllegalArgumentException();
         ChineseRemainderTheorem crt = new ChineseRemainderTheorem();
@@ -32,7 +57,7 @@ public class ChineseRemainderTheorem {
     }
 
     /**
-     * Add an equation of the form cx≡a(mod m) to the system
+     * Add an equation of the form cx≡a(mod m) to the system.
      * @param c the coefficient
      * @param a the remainder
      * @param m the modulus
@@ -103,6 +128,10 @@ public class ChineseRemainderTheorem {
         return true;
     }
 
+    /**
+     * Solve the system of equations.
+     * @return an array of two longs: x, M such that x is the solution modulo M
+     */
     public long[] solve() {
         if (!reduce()) return null;
 
@@ -120,6 +149,11 @@ public class ChineseRemainderTheorem {
         return new long[] {x, M};
     }
 
+    /**
+     * Prime factorization of a number.
+     * @param n the number to factor
+     * @return a list of prime factors of n
+     */
     private static ArrayList<Long> primeFactorization(long n) {
         ArrayList<Long> factors = new ArrayList<>();
         if (n <= 0) throw new IllegalArgumentException();
@@ -144,7 +178,7 @@ public class ChineseRemainderTheorem {
     }
 
     /**
-     * Pollard's rho algorithm to find a factor of a number
+     * Pollard's rho algorithm to find a factor of a number.
      * @param n the number to factor
      * @return a factor of n
      */
@@ -166,7 +200,7 @@ public class ChineseRemainderTheorem {
     }
 
     /**
-     * Greatest common factor
+     * Greatest common factor.
      * @param a the first number
      * @param b the second number
      * @return the greatest common factor of a and b
@@ -176,7 +210,7 @@ public class ChineseRemainderTheorem {
     }
 
     /**
-     * Checks if a number is prime
+     * Checks if a number is prime.
      * @param n the number to check
      * @return true if the number is prime, false otherwise
      */
@@ -193,7 +227,7 @@ public class ChineseRemainderTheorem {
     }
 
     /**
-     * Extended Euclidean algorithm
+     * Extended Euclidean algorithm.
      * @param a the first number
      * @param b the second number
      * @return an array of three longs: gcd(a,b), x, y such that ax + by = gcd(a,b)
