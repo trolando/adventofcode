@@ -1,12 +1,22 @@
 package nl.tvandijk.aoc.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class Util {
+    public static <T> Set<Pair<T,T>> getPairs(Collection<T> collection) {
+        var res = new HashSet<Pair<T,T>>();
+        var list = new ArrayList<>(collection);
+        for (int i = 0; i < list.size(); i++) {
+            var a = list.get(i);
+            for (int j = i+1; j < list.size(); j++) {
+                var b = list.get(j);
+                res.add(Pair.of(a, b));
+            }
+        }
+        return res;
+    }
+
     public static <T> List<List<T>> splitList(List<T> list, Predicate<T> condition) {
         List<List<T>> result = new ArrayList<>();
         List<T> currentSubList = new ArrayList<>();

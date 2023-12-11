@@ -35,6 +35,10 @@ public class Point3 {
         return new Point3(-x, -y, -z);
     }
 
+    public long manhattan(Point3 other) {
+        return Math.abs(x-other.x) + Math.abs(y-other.y) + Math.abs(z-other.z);
+    }
+
     public List<Point3> adjacent(boolean diag) {
         var res = new ArrayList<Point3>();
         res.add(delta(-1, 0, 0));

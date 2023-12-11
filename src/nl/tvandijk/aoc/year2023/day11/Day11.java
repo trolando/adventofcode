@@ -25,50 +25,38 @@ public class  Day11 extends Day {
     @Override
     protected Object part1() {
         // part 1
-        List<Point> galaxies = new ArrayList<>();
-        for (var p : grid.findAll('#')) {
-            var x = p.x;
-            var y = p.y;
-            for (int i = 0; i < p.x; i++) {
-                if (emptyCols.contains(i)) x += 1;
-            }
-            for (int i = 0; i < p.y; i++) {
-                if (emptyRows.contains(i)) y+= 1;
-            }
-            galaxies.add(Point.of(x, y));
+        int[] xs = new int[grid.width()];
+        int x = 0;
+        for (int i = 0; i < grid.width(); i++) {
+            x += emptyCols.contains(i) ? 2 : 1;
+            xs[i] = x;
         }
-        long sum = 0;
-        for (int i = 0; i < galaxies.size(); i++) {
-            for (int j = i+1; j < galaxies.size(); j++) {
-                var d = galaxies.get(i).manhattan(galaxies.get(j));
-                sum += d;
-            }
+        int[] ys = new int[grid.height()];
+        int y = 0;
+        for (int i = 0; i < grid.height(); i++) {
+            y += emptyRows.contains(i) ? 2 : 1;
+            ys[i] = y;
         }
-        return sum;
+        var galaxies = grid.findAll('#').stream().map(p -> Point.of(xs[(int)p.x], ys[(int)p.y])).toList();
+        return Util.getPairs(galaxies).stream().mapToLong(p -> p.a.manhattan(p.b)).sum();
     }
 
     @Override
     protected Object part2() {
         // part 2
-        List<Point> galaxies = new ArrayList<>();
-        for (var p : grid.findAll('#')) {
-            var x = p.x;
-            var y = p.y;
-            for (int i = 0; i < p.x; i++) {
-                if (emptyCols.contains(i)) x += 999999;
-            }
-            for (int i = 0; i < p.y; i++) {
-                if (emptyRows.contains(i)) y += 999999;
-            }
-            galaxies.add(Point.of(x, y));
+        int[] xs = new int[grid.width()];
+        int x = 0;
+        for (int i = 0; i < grid.width(); i++) {
+            x += emptyCols.contains(i) ? 1000000 : 1;
+            xs[i] = x;
         }
-        long sum = 0;
-        for (int i = 0; i < galaxies.size(); i++) {
-            for (int j = i+1; j < galaxies.size(); j++) {
-                var d = galaxies.get(i).manhattan(galaxies.get(j));
-                sum += d;
-            }
+        int[] ys = new int[grid.height()];
+        int y = 0;
+        for (int i = 0; i < grid.height(); i++) {
+            y += emptyRows.contains(i) ? 1000000 : 1;
+            ys[i] = y;
         }
-        return sum;
+        var galaxies = grid.findAll('#').stream().map(p -> Point.of(xs[(int)p.x], ys[(int)p.y])).toList();
+        return Util.getPairs(galaxies).stream().mapToLong(p -> p.a.manhattan(p.b)).sum();
     }
 }
