@@ -21,6 +21,10 @@ public class Point {
         return new Point(x, y);
     }
 
+    public long manhattan(Point other) {
+        return Math.abs(x-other.x) + Math.abs(y-other.y);
+    }
+
     public Point delta(long dx, long dy) {
         return new Point(x+dx, y+dy);
     }
