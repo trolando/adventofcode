@@ -1,6 +1,7 @@
 package nl.tvandijk.aoc.util;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Grid {
@@ -21,6 +22,15 @@ public class Grid {
         }
     }
 
+    private Grid(List<String> lines, char def) {
+        this.def = def;
+        // make a copy of lines
+        grid = new char[lines.size()][];
+        for (int i = 0; i < lines.size(); i++) {
+            grid[i] = lines.get(i).toCharArray();
+        }
+    }
+
     /**
      * Create a grid with a default value
      * @param lines the lines
@@ -32,11 +42,30 @@ public class Grid {
     }
 
     /**
+     * Create a grid with a default value
+     * @param lines the lines
+     * @param def the default value
+     * @return a grid
+     */
+    public static Grid of(List<String> lines, char def) {
+        return new Grid(lines, def);
+    }
+
+    /**
      * Create a grid with a default value of '.'
      * @param lines the lines
      * @return a grid
      */
     public static Grid of(String[] lines) {
+        return new Grid(lines, '.');
+    }
+
+    /**
+     * Create a grid with a default value of '.'
+     * @param lines the lines
+     * @return a grid
+     */
+    public static Grid of(List<String> lines) {
         return new Grid(lines, '.');
     }
 
