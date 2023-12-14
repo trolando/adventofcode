@@ -12,9 +12,7 @@ public class Day13 extends Day {
             for (int k = 0; k < grid.height(); k++) {
                 for (int j = 0; j < grid.width(); j++) {
                     if (i - j < 0 || i + 1 + j >= grid.width()) break;
-                    if (grid.get(i + 1 + j, k) != grid.get(i - j, k)) {
-                        diff++;
-                    }
+                    if (grid.get(i + 1 + j, k) != grid.get(i - j, k)) diff++;
                 }
             }
             if (diff == wantedDiff) return i + 1L;
@@ -23,11 +21,9 @@ public class Day13 extends Day {
             // try if this row is a mirror?
             long diff = 0;
             for (int k = 0; k < grid.width(); k++) {
-                for (int j = 0; j <= i; j++) {
+                for (int j = 0; j < grid.height(); j++) {
                     if (i - j < 0 || i + 1 + j >= grid.height()) break;
-                    if (grid.get(k, i + 1 + j) != grid.get(k, i - j)) {
-                        diff++;
-                    }
+                    if (grid.get(k, i + 1 + j) != grid.get(k, i - j)) diff++;
                 }
             }
             if (diff == wantedDiff) return 100L * (i + 1);

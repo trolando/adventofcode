@@ -1,8 +1,6 @@
 package nl.tvandijk.aoc.util;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Grid {
     private char def;
@@ -31,6 +29,14 @@ public class Grid {
         }
     }
 
+    private Grid(Grid g) {
+        this.def = g.def;
+        grid = new char[g.grid.length][];
+        for (int i = 0; i < g.grid.length; i++) {
+            grid[i] = Arrays.copyOf(g.grid[i], g.grid[i].length);
+        }
+    }
+
     /**
      * Create a grid with a default value
      * @param lines the lines
@@ -49,6 +55,10 @@ public class Grid {
      */
     public static Grid of(List<String> lines, char def) {
         return new Grid(lines, def);
+    }
+
+    public Grid copy() {
+        return new Grid(this);
     }
 
     /**
@@ -132,5 +142,83 @@ public class Grid {
      */
     public int height() {
         return grid.length;
+    }
+
+    public void set(int x, int y, char ch) {
+        grid[y][x] = ch;
+    }
+
+    public void clockwise() {
+        var newGrid = new char[grid[0].length][grid.length];
+        for (int y = 0; y < grid.length; y++) {
+            var line = grid[y];
+            for (int x = 0; x < line.length; x++) {
+                newGrid[x][grid.length - y - 1] = line[x];
+            }
+        }
+        for (int y = 0; y < grid.length; y++) {
+            grid[y] = newGrid[y];
+        }
+    }
+
+    public void counterclockwise() {
+        var newGrid = new char[grid[0].length][grid.length];
+        for (int y = 0; y < grid.length; y++) {
+            var line = grid[y];
+            for (int x = 0; x < line.length; x++) {
+                newGrid[grid[0].length - x - 1][y] = line[x];
+            }
+        }
+        for (int y = 0; y < grid.length; y++) {
+            grid[y] = newGrid[y];
+        }
+    }
+
+    public void rotate() {
+        var newGrid = new char[grid[0].length][grid.length];
+        for (int y = 0; y < grid.length; y++) {
+            var line = grid[y];
+            for (int x = 0; x < line.length; x++) {
+                newGrid[x][grid.length - y - 1] = line[x];
+            }
+        }
+        for (int y = 0; y < grid.length; y++) {
+            grid[y] = newGrid[y];
+        }
+    }
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder();
+        for (var line : grid) {
+            sb.append(line);
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
+
+    public long count(char ch) {
+        long res = 0;
+        for (var line : grid) {
+            for (var c : line) {
+                if (c == ch) res++;
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Grid grid1 = (Grid) o;
+        return def == grid1.def && Arrays.deepEquals(grid, grid1.grid);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(def);
+        result = 31 * result + Arrays.deepHashCode(grid);
+        return result;
     }
 }
