@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Grid {
     private char def;
-    private final char[][] grid;
+    private char[][] grid;
 
     /**
      * Create a grid
@@ -148,6 +148,31 @@ public class Grid {
         grid[y][x] = ch;
     }
 
+    public String getColumn(int x) {
+        var sb = new StringBuilder();
+        for (int y = 0; y < grid.length; y++) {
+            sb.append(grid[y][x]);
+        }
+        return sb.toString();
+    }
+
+    public String getRow(int y) {
+        return new String(grid[y]);
+    }
+
+    public void setColumn(int x, String column) {
+        for (int y = 0; y < grid.length; y++) {
+            grid[y][x] = column.charAt(y);
+        }
+    }
+
+    public void setRow(int y, String row) {
+        grid[y] = row.toCharArray();
+    }
+
+    /**
+     * Rotate the grid clockwise
+     */
     public void clockwise() {
         var newGrid = new char[grid[0].length][grid.length];
         for (int y = 0; y < grid.length; y++) {
@@ -156,11 +181,12 @@ public class Grid {
                 newGrid[x][grid.length - y - 1] = line[x];
             }
         }
-        for (int y = 0; y < grid.length; y++) {
-            grid[y] = newGrid[y];
-        }
+        grid = newGrid;
     }
 
+    /**
+     * Rotate the grid counterclockwise
+     */
     public void counterclockwise() {
         var newGrid = new char[grid[0].length][grid.length];
         for (int y = 0; y < grid.length; y++) {
@@ -169,22 +195,7 @@ public class Grid {
                 newGrid[grid[0].length - x - 1][y] = line[x];
             }
         }
-        for (int y = 0; y < grid.length; y++) {
-            grid[y] = newGrid[y];
-        }
-    }
-
-    public void rotate() {
-        var newGrid = new char[grid[0].length][grid.length];
-        for (int y = 0; y < grid.length; y++) {
-            var line = grid[y];
-            for (int x = 0; x < line.length; x++) {
-                newGrid[x][grid.length - y - 1] = line[x];
-            }
-        }
-        for (int y = 0; y < grid.length; y++) {
-            grid[y] = newGrid[y];
-        }
+        grid = newGrid;
     }
 
     @Override
@@ -197,6 +208,11 @@ public class Grid {
         return sb.toString();
     }
 
+    /**
+     * Count how often a character occurs in the grid
+     * @param ch the character
+     * @return the count
+     */
     public long count(char ch) {
         long res = 0;
         for (var line : grid) {

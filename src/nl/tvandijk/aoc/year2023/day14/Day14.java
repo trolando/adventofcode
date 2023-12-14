@@ -6,30 +6,19 @@ import nl.tvandijk.aoc.common.Day;
 import nl.tvandijk.aoc.util.*;
 
 public class Day14 extends Day {
-    @Override
-    protected void processInput(String fileContents) {
-        // process the input
-        super.processInput(fileContents);
-    }
-
     private void tiltNorth(Grid g) {
         for (int x = 0; x < g.width(); x++) {
             // slide upwards until # for this column
+            int lastempty = 0;
             for (int y = 0; y < g.height(); y++) {
-                // count number of O before #
-                int count = 0;
-                for (int yy = y; yy < g.height(); yy++) {
-                    if (g.get(x, yy) == '#') break;
-                    if (g.get(x, yy) == 'O') count++;
-                }
-                // move the O's up
-                for (int i = 0; i < count; i++) {
-                    g.set(x, y+i, 'O');
-                }
-                y += count;
-                for (; y < g.height(); y++) {
-                    if (g.get(x, y) == '#') break;
-                    g.set(x, y, '.');
+                if (g.get(x, y) == '#') {
+                    lastempty = y + 1;
+                } else if (g.get(x, y) == 'O') {
+                    if (lastempty != y) {
+                        g.set(x, lastempty, 'O');
+                        g.set(x, y, '.');
+                    }
+                    lastempty++;
                 }
             }
         }
@@ -43,16 +32,16 @@ public class Day14 extends Day {
         return grid.findAll('O').stream().mapToLong(p -> grid.height() - p.y).sum();
     }
 
-    private Map<Grid, Integer> trace = new HashMap<>();
+    private final Map<Grid, Integer> trace = new HashMap<>();
 
     private void cycle() {
-        tiltNorth(grid);
+        tiltNorth(grid); // north
         grid.clockwise();
-        tiltNorth(grid);
+        tiltNorth(grid); // west
         grid.clockwise();
-        tiltNorth(grid);
+        tiltNorth(grid); // south
         grid.clockwise();
-        tiltNorth(grid);
+        tiltNorth(grid); // east
         grid.clockwise();
     }
 
@@ -61,9 +50,8 @@ public class Day14 extends Day {
         // part 2
         for (int j = 0; j < 1000000000; j++) {
             cycle();
-            var g = grid.copy();
-            if (trace.containsKey(g)) {
-                int start = trace.get(g);
+            if (trace.containsKey(grid)) {
+                int start = trace.get(grid);
                 int period = j - start;
                 int offset = (1000000000 - 1 - start) % period;
                 for (int i = 0; i < offset; i++) {
@@ -71,7 +59,7 @@ public class Day14 extends Day {
                 }
                 break;
             }
-            trace.put(g, j);
+            trace.put(grid.copy(), j);
         }
         // now calculate the load
         return grid.findAll('O').stream().mapToLong(p -> grid.height() - p.y).sum();
