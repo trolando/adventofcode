@@ -28,9 +28,9 @@ public class Day15 extends Day {
                 var h = hash(s[0]);
                 var l = boxes.computeIfAbsent(h, k -> new ArrayList<>());
                 boolean found = false;
-                for (int i = 0; i < l.size(); i++) {
-                    if (l.get(i).a.equals(s[0])) {
-                        l.get(i).b = Integer.parseInt(s[1]);
+                for (var pair : l) {
+                    if (pair.a.equals(s[0])) {
+                        pair.b = Integer.parseInt(s[1]);
                         found = true;
                         break;
                     }
