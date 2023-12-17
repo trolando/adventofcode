@@ -44,6 +44,16 @@ public class Point {
         return res;
     }
 
+    public Point to(Direction dir) {
+        switch (dir) {
+            case RIGHT, EAST -> { return right(); }
+            case LEFT, WEST -> { return left(); }
+            case UP, NORTH -> { return up(); }
+            case DOWN, SOUTH -> { return down(); }
+        }
+        throw new RuntimeException("Unknown direction: " + dir);
+    }
+
     public Point left() {
         return delta(-1, 0);
     }
