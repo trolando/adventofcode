@@ -123,4 +123,46 @@ public class Util {
         for (int i = 1; i < input.length; i++) result = lcm(result, input[i]);
         return result;
     }
+
+    /**
+     * Compute area under a polygon of points
+     * @param points the points (consecutive order)
+     * @return the area
+     */
+    public static long shoelace(List<Point> points) {
+        // Calculate with shoelace formula
+        // x1y2 - x2y1 + ... + xny1 - x1yn
+        long result = 0;
+        var size = points.size();
+        for (int i = 0; i < size; i++) {
+            var pt = points.get(i);
+            var pt2 = points.get((i+1)%size);
+            result += pt.x * pt2.y - pt2.x * pt.y;
+        }
+        return result / 2;
+    }
+
+    /**
+     * Compute digital area using shoelace and Pick's theorem
+     * @param points the points (consecutive order)
+     * @return the area
+     */
+    public static long area(List<Point> points, boolean includeBorder) {
+        // Pick's theorem: Area = i + b/2 - 1
+        // where i is number of interior points and b is number of boundary points
+        // thus the interior i = Area + 1 - b/2
+        // however we want to include the boundary! so
+        // points = Area + 1 + b/2
+        var area = 0L;
+        var boundary = 0L;
+        var size = points.size();
+        for (int i = 0; i < size; i++) {
+            var pt = points.get(i);
+            var pt2 = points.get((i+1)%size);
+            boundary += pt.manhattan(pt2);
+            area += pt.x * pt2.y - pt2.x * pt.y;
+        }
+        if (includeBorder) return area/2 + 1 + boundary/2;
+        else return area/2 + 1 - boundary/2;
+    }
 }

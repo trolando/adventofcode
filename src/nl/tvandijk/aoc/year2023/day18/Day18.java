@@ -27,12 +27,12 @@ public class Day18 extends Day {
                 if (dir == Direction.UP) u.add(pt);
                 pt = pt.to(dir);
                 g.add(pt);
-                if (dir == Direction.UP && i+1 != len) u.add(pt);
+                if (dir == Direction.UP && i + 1 != len) u.add(pt);
                 if (dir == Direction.DOWN) u.add(pt);
             }
         }
         // create interior
-        int minx =  g.stream().mapToInt(s -> (int) s.x).min().orElseThrow();
+        int minx = g.stream().mapToInt(s -> (int) s.x).min().orElseThrow();
         int miny = g.stream().mapToInt(s -> (int) s.y).min().orElseThrow();
         int maxx = g.stream().mapToInt(s -> (int) s.x).max().orElseThrow();
         int maxy = g.stream().mapToInt(s -> (int) s.y).max().orElseThrow();
@@ -41,7 +41,7 @@ public class Day18 extends Day {
             for (int x = minx; x <= maxx; x++) {
                 if (u.contains(Point.of(x, y))) {
                     inside = !inside;
-                    System.out.print('|');
+                    System.out.print('#');
                 } else if (g.contains(Point.of(x, y))) {
                     System.out.print('#');
                 } else {
@@ -61,12 +61,8 @@ public class Day18 extends Day {
     @Override
     protected Object part2() {
         // part 2
+        List<Point> boundary = new ArrayList<>();
         Point pt = Point.of(0, 0);
-        Point prev = null;
-        // Calculate with shoelace formula with first point in (0,0)
-        // x1y2 - x2y1 + ... + xny1 - x1yn
-        long area = 0;
-        long boundarypoints = 0;
         for (var l : lines) {
             var s = l.split(" ");
             var len = Integer.parseInt(s[2].substring(2, 7), 16);
@@ -77,17 +73,9 @@ public class Day18 extends Day {
                 case "3" -> Direction.UP;
                 default -> null;
             };
-            boundarypoints += len;
             pt = pt.to(dir, len);
-            if (prev != null) area += prev.x*pt.y-pt.x*prev.y;
-            prev = pt;
+            boundary.add(pt);
         }
-        area /= 2;
-        // Pick's theorem: Area = i + b/2 - 1
-        // where i is number of interior points and b is number of boundary points
-        // thus the interior i = Area + 1 - b/2
-        // however we want to include the boundary! so
-        // points = Area + 1 + b/2
-        return area + 1 + boundarypoints/2;
+        return Util.area(boundary, true);
     }
 }
