@@ -54,6 +54,16 @@ public class Point {
         throw new RuntimeException("Unknown direction: " + dir);
     }
 
+    public Point to(Direction dir, long amount) {
+        switch (dir) {
+            case RIGHT, EAST -> { return delta(amount, 0); }
+            case LEFT, WEST -> { return delta(-amount, 0); }
+            case UP, NORTH -> { return delta(0, -amount); }
+            case DOWN, SOUTH -> { return delta(0, amount); }
+        }
+        throw new RuntimeException("Unknown direction: " + dir);
+    }
+
     public Point left() {
         return delta(-1, 0);
     }
