@@ -6,86 +6,12 @@ import nl.tvandijk.aoc.common.Day;
 import nl.tvandijk.aoc.util.*;
 
 public class Day19 extends Day {
-    private interface Rule {
-        String accept(Map<String, Integer> map);
-    }
-
-    private static class RuleGreater implements Rule {
-        String var;
-        int value;
-        String dest;
-
-        public RuleGreater(String var, int value, String dest) {
-            this.var = var;
-            this.value = value;
-            this.dest = dest;
-        }
-
-        public String accept(Map<String, Integer> map) {
-            if (map.get(var) > value) return dest;
-            else return null;
-        }
-    }
-
-    private static class RuleLess implements Rule {
-        String var;
-        int value;
-        String dest;
-
-        public RuleLess(String var, int value, String dest) {
-            this.var = var;
-            this.value = value;
-            this.dest = dest;
-        }
-
-        public String accept(Map<String, Integer> map) {
-            if (map.get(var) < value) return dest;
-            else return null;
-        }
-    }
-
-    private static class RuleJump implements Rule {
-        private String dest;
-
-        public RuleJump(String dest) {
-            this.dest = dest;
-        }
-
-        @Override
-        public String accept(Map<String, Integer> map) {
-            return dest;
-        }
-    }
-
-    static class Block {
-        String flow;
-        int xmin;
-        int xmax;
-        int mmin;
-        int mmax;
-        int amin;
-        int amax;
-        int smin;
-        int smax;
-
-        public Block(String flow, int xmin, int xmax, int mmin, int mmax, int amin, int amax, int smin, int smax) {
-            this.flow = flow;
-            this.xmin = xmin;
-            this.xmax = xmax;
-            this.mmin = mmin;
-            this.mmax = mmax;
-            this.amin = amin;
-            this.amax = amax;
-            this.smin = smin;
-            this.smax = smax;
-        }
-    }
+    private final Map<String, List<Rule>> ruleMap = new HashMap<>();
 
     @Override
-    protected Object part1() {
-        // part 1
+    protected void processInput(String fileContents) {
+        super.processInput(fileContents);
         var pp = Util.splitArray(lines, String::isBlank);
-        Map<String, List<Rule>> ruleMap = new HashMap<>();
         for (var line : pp.get(0)) {
             var p = line.split("[\\{\\}]");
             List<Rule> rules = new ArrayList<>();
@@ -106,6 +32,12 @@ public class Day19 extends Day {
             }
             ruleMap.put(p[0], rules);
         }
+    }
+
+    @Override
+    protected Object part1() {
+        // part 1
+        var pp = Util.splitArray(lines, String::isBlank);
         long res = 0;
         for (var line : pp.get(1)) {
             Map<String, Integer> vals = new HashMap<>();
@@ -135,88 +67,66 @@ public class Day19 extends Day {
     @Override
     protected Object part2() {
         // part 2
-        var pp = Util.splitArray(lines, String::isBlank);
-        Map<String, List<Rule>> ruleMap = new HashMap<>();
-        for (var line : pp.get(0)) {
-            var p = line.split("[\\{\\}]");
-            List<Rule> rules = new ArrayList<>();
-            for (var instr : p[1].split(",")) {
-                var p2 = instr.split(":");
-                if (p2.length == 2) {
-                    var check = p2[0];
-                    if (check.contains(">")) {
-                        var c = check.split(">");
-                        rules.add(new RuleGreater(c[0], Integer.parseInt(c[1]), p2[1]));
-                    } else {
-                        var c = check.split("<");
-                        rules.add(new RuleLess(c[0], Integer.parseInt(c[1]), p2[1]));
-                    }
-                } else {
-                    rules.add(new RuleJump(p2[0]));
-                }
-            }
-            ruleMap.put(p[0], rules);
-        }
         long res = 0L;
         Deque<Block> blocks = new ArrayDeque<>();
         var initial = new Block("in", 1, 4000, 1, 4000, 1, 4000, 1, 4000);
         blocks.add(initial);
         while (!blocks.isEmpty()) {
             var next = blocks.pop();
-            if (next.xmax < next.xmin) continue;
-            if (next.mmax < next.mmin) continue;
-            if (next.amax < next.amin) continue;
-            if (next.smax < next.smin) continue;
-            if (next.flow.equals("R")) continue;
-            if (next.flow.equals("A")) {
-                long x = next.xmax - next.xmin + 1L;
-                long m = next.mmax - next.mmin + 1L;
-                long a = next.amax - next.amin + 1L;
-                long s = next.smax - next.smin + 1L;
+            if (next.xmax() < next.xmin()) continue;
+            if (next.mmax() < next.mmin()) continue;
+            if (next.amax() < next.amin()) continue;
+            if (next.smax() < next.smin()) continue;
+            if (next.flow().equals("R")) continue;
+            if (next.flow().equals("A")) {
+                long x = next.xmax() - next.xmin() + 1L;
+                long m = next.mmax() - next.mmin() + 1L;
+                long a = next.amax() - next.amin() + 1L;
+                long s = next.smax() - next.smin() + 1L;
                 res += x * m * a * s;
                 continue;
             }
             // get flow
-            for (var rule : ruleMap.get(next.flow)) {
+            for (var rule : ruleMap.get(next.flow())) {
                 if (rule instanceof RuleGreater r) {
                     if (r.var.equals("x")) {
-                        blocks.add(new Block(r.dest, r.value + 1, next.xmax, next.mmin, next.mmax, next.amin, next.amax, next.smin, next.smax));
-                        next.xmax = r.value;
+                        blocks.add(next.withXmin(r.value+1).withFlow(r.dest));
+                        next = next.withXmax(r.value);
                     }
                     if (r.var.equals("m")) {
-                        blocks.add(new Block(r.dest, next.xmin, next.xmax, r.value + 1, next.mmax, next.amin, next.amax, next.smin, next.smax));
-                        next.mmax = r.value;
+                        blocks.add(next.withMmin(r.value+1).withFlow(r.dest));
+                        next = next.withMmax(r.value);
                     }
                     if (r.var.equals("a")) {
-                        blocks.add(new Block(r.dest, next.xmin, next.xmax, next.mmin, next.mmax, r.value + 1, next.amax, next.smin, next.smax));
-                        next.amax = r.value;
+                        blocks.add(next.withAmin(r.value+1).withFlow(r.dest));
+                        next = next.withAmax(r.value);
                     }
                     if (r.var.equals("s")) {
-                        blocks.add(new Block(r.dest, next.xmin, next.xmax, next.mmin, next.mmax, next.amin, next.amax, r.value + 1, next.smax));
-                        next.smax = r.value;
+                        blocks.add(next.withSmin(r.value+1).withFlow(r.dest));
+                        next = next.withSmax(r.value);
                     }
                 }
                 if (rule instanceof RuleLess r) {
                     if (r.var.equals("x")) {
-                        blocks.add(new Block(r.dest, next.xmin, r.value - 1, next.mmin, next.mmax, next.amin, next.amax, next.smin, next.smax));
-                        next.xmin = r.value;
+                        blocks.add(next.withXmax(r.value-1).withFlow(r.dest));
+                        next = next.withXmin(r.value);
                     }
                     if (r.var.equals("m")) {
-                        blocks.add(new Block(r.dest, next.xmin, next.xmax, next.mmin, r.value - 1, next.amin, next.amax, next.smin, next.smax));
-                        next.mmin = r.value;
+                        blocks.add(next.withMmax(r.value-1).withFlow(r.dest));
+                        next = next.withMmin(r.value);
                     }
                     if (r.var.equals("a")) {
-                        blocks.add(new Block(r.dest, next.xmin, next.xmax, next.mmin, next.mmax, next.amin, r.value - 1, next.smin, next.smax));
-                        next.amin = r.value;
+                        blocks.add(next.withAmax(r.value-1).withFlow(r.dest));
+                        next = next.withAmin(r.value);
                     }
                     if (r.var.equals("s")) {
-                        blocks.add(new Block(r.dest, next.xmin, next.xmax, next.mmin, next.mmax, next.amin, next.amax, next.smin, r.value - 1));
-                        next.smin = r.value;
+                        blocks.add(next.withSmax(r.value-1).withFlow(r.dest));
+                        next = next.withSmin(r.value);
                     }
                 }
                 if (rule instanceof RuleJump r) {
-                    next.flow = r.dest;
-                    blocks.add(next);
+                    blocks.add(next.withFlow(r.dest));
+                    break;
                 }
             }
         }
