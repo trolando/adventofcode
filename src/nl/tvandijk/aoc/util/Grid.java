@@ -5,6 +5,7 @@ import java.util.*;
 public class Grid {
     private char def;
     private char[][] grid;
+    private boolean repeats = false;
 
     /**
      * Create a grid
@@ -61,6 +62,10 @@ public class Grid {
         return new Grid(this);
     }
 
+    public void setRepeats(boolean repeats) {
+        this.repeats = repeats;
+    }
+
     /**
      * Create a grid with a default value of '.'
      * @param lines the lines
@@ -103,6 +108,11 @@ public class Grid {
      * @return the character
      */
     public char get(long x, long y) {
+        if (repeats) {
+            // ackshually
+            x = x >= 0 ? x % width() : (width() + (x % width())) % width();
+            y = y >= 0 ? y % height() : (height() + (y % height())) % width();
+        }
         if (x < 0) return def;
         if (y < 0) return def;
         if (y >= grid.length) return def;
@@ -146,6 +156,10 @@ public class Grid {
 
     public void set(int x, int y, char ch) {
         grid[y][x] = ch;
+    }
+
+    public void set(Point p, char ch) {
+        set((int) p.x, (int) p.y, ch);
     }
 
     public String getColumn(int x) {

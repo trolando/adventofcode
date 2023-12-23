@@ -9,9 +9,10 @@ public class Graph<N> {
     /**
      * A function that determines the successors of a node.
      */
-    public interface SuccessorFunction <N> {
+    public interface SuccessorFunction<N> {
         /**
          * Determine the successors of a node.
+         *
          * @param state the node
          * @return a collection of pairs of adjacent nodes and their weight/distance
          */
@@ -21,9 +22,10 @@ public class Graph<N> {
     /**
      * A function that determines whether a node is final.
      */
-    public interface IsFinalFunction <S> {
+    public interface IsFinalFunction<S> {
         /**
          * Determine whether a node is final.
+         *
          * @param state the node
          * @return true if the node is final, false otherwise
          */
@@ -44,6 +46,7 @@ public class Graph<N> {
 
     /**
      * Create a graph with a successor function.
+     *
      * @param successorFunction the successor function
      */
     public Graph(SuccessorFunction<N> successorFunction) {
@@ -52,6 +55,7 @@ public class Graph<N> {
 
     /**
      * Get all the edges of the node.
+     *
      * @param node the node
      * @return a map from all adjacent nodes to their weight/distance
      */
@@ -68,6 +72,7 @@ public class Graph<N> {
 
     /**
      * Add an edge from the source node to the target node with the given weight.
+     *
      * @param source the source node
      * @param target the target node
      * @param weight the weight/distance
@@ -78,6 +83,7 @@ public class Graph<N> {
 
     /**
      * Get all adjacent nodes of the node.
+     *
      * @param node the node
      * @return a set of all adjacent nodes
      */
@@ -87,6 +93,7 @@ public class Graph<N> {
 
     /**
      * Get the weight of the edge from the source node to the target node. If there is no edge, return Long.MAX_VALUE.
+     *
      * @param source the source node
      * @param target the target node
      * @return the weight/distance
@@ -97,6 +104,7 @@ public class Graph<N> {
 
     /**
      * Get all nodes in the graph.
+     *
      * @return a set of all the nodes
      */
     public Set<N> getAllNodes() {
@@ -105,6 +113,7 @@ public class Graph<N> {
 
     /**
      * Compute the shortest path from the source node to the target node.
+     *
      * @param source the source node
      * @param target the target node
      * @return the distance from the source node to the target node
@@ -115,6 +124,7 @@ public class Graph<N> {
 
     /**
      * Compute the shortest path from the source node to all other nodes.
+     *
      * @return a map from all nodes to their distance from the source node
      */
     public Dijkstra<N> dijkstra() {
@@ -123,6 +133,7 @@ public class Graph<N> {
 
     /**
      * Compute all distances from all nodes to all other nodes.
+     *
      * @return a map from all nodes to their distance from all other nodes
      */
     public FloydWarshall<N> floydWarshall() {
@@ -131,6 +142,7 @@ public class Graph<N> {
 
     /**
      * Compute all distances from the initial set of nodes to all other nodes.
+     *
      * @param initial the initial set of nodes
      * @return a map from all nodes to their distance from the initial set of nodes
      */
@@ -169,6 +181,7 @@ public class Graph<N> {
 
     /**
      * Compute the shortest path from the initial set of nodes to any final node.
+     *
      * @param initial the initial set of nodes
      * @param isFinal a function that determines whether a node is final
      * @return a pair of a map from all nodes to their distance from the initial set of nodes and a trace of nodes
@@ -217,5 +230,77 @@ public class Graph<N> {
         }
 
         return Pair.of(distance, null);
+    }
+
+    public Graph<N> edgeCompress() {
+        return new Graph<>(state -> {
+            var successors = new ArrayList<Pair<N, Long>>();
+            for (var edge : getEdges(state).entrySet()) {
+                var prev = state;
+                var target = edge.getKey();
+                var weight = edge.getValue();
+                var targetEdges = getEdges(target);
+                while (targetEdges.size() == 2 && targetEdges.containsKey(prev)) {
+                    // get the target that isn't prev
+                    for (var e : targetEdges.entrySet()) {
+                        if (!e.getKey().equals(prev)) {
+                            prev = target;
+                            target = e.getKey();
+                            weight += e.getValue();
+                            targetEdges = getEdges(target);
+                            break;
+                        }
+                    }
+                }
+                successors.add(Pair.of(target, weight));
+            }
+            return successors;
+        });
+    }
+
+    public Pair<List<N>, Long> longestPath(N initial, N goal) {
+        List<N> best = null;
+        long bestLength = -1L;
+        Set<N> stackSet = new HashSet<>();
+        Deque<Pair<N, Set<N>>> stack = new ArrayDeque<>();
+        stack.add(Pair.of(initial, null));
+        stackSet.add(initial);
+        while (!stack.isEmpty()) {
+            // check top
+            var cur = stack.peekLast();
+            if (cur.b == null) {
+                cur.b = new HashSet<>(getAdjacentNodes(cur.a));
+            }
+            if (cur.b.isEmpty()) {
+                // backtrack
+                stackSet.remove(cur.a);
+                stack.removeLast();
+            } else {
+                // pick one
+                var next = cur.b.iterator().next();
+                cur.b.remove(next);
+                if (stackSet.contains(next)) continue; // ignore it
+                if (next.equals(goal)) {
+                    // found a path
+                    var path = new ArrayList<N>();
+                    for (var p : stack) {
+                        path.add(p.a);
+                    }
+                    path.add(next);
+                    long dist = 0L;
+                    for (int i = 1; i < path.size(); i++) {
+                        dist += getWeight(path.get(i - 1), path.get(i));
+                    }
+                    if (dist > bestLength) {
+                        bestLength = dist;
+                        best = path;
+                    }
+                } else {
+                    stack.add(Pair.of(next, null));
+                    stackSet.add(next);
+                }
+            }
+        }
+        return Pair.of(best, bestLength);
     }
 }
