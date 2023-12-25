@@ -53,6 +53,13 @@ public class Graph<N> {
         this.successorFunction = successorFunction;
     }
 
+    public Graph(Graph<N> other) {
+        for (var e : other.weights.entrySet()) {
+            this.weights.put(e.getKey(), new HashMap<>(e.getValue()));
+        }
+        this.successorFunction = other.successorFunction;
+    }
+
     /**
      * Get all the edges of the node.
      *
@@ -302,5 +309,86 @@ public class Graph<N> {
             }
         }
         return Pair.of(best, bestLength);
+    }
+
+    public Triple<Set<Pair<N, N>>, Set<N>, Set<N>> minCut() {
+        var p = new Graph<>(this).minCutPartition();
+        var res = new HashSet<Pair<N, N>>();
+        for (var v : p) {
+            for (var u : getAdjacentNodes(v)) {
+                if (!p.contains(u)) {
+                    res.add(Pair.of(v, u));
+                }
+            }
+        }
+        var o = new HashSet<>(getAllNodes());
+        o.removeAll(p);
+        return Triple.of(res, p, o);
+    }
+
+    private Set<N> minCutPartition() {
+        var uf = new UnionFind<N>();
+        long minCut = Long.MAX_VALUE;
+        Set<N> bestCut = null;
+        while (getAllNodes().size() > 1) {
+            // FIRST step: contract(s, t) for some s, t
+            // reset weights and added
+            Map<N, Long> weights = new HashMap<>(); // weights of vertices adjacent to the added vertices
+            Set<N> added = new HashSet<>();
+            // start by adding a vertex to <added>
+            N prevVertex = null;
+            for (int i = 0; i < getAllNodes().size(); i++) {
+                N currentMaxVertex = null;
+                long currentMaxWeight = Long.MIN_VALUE;
+                // find a vertex with the highest weight... ("tighest" edge)
+                for (N v : getAllNodes()) {
+                    if (added.contains(v)) continue;
+                    if (weights.computeIfAbsent(v, x -> 0L) > currentMaxWeight) {
+                        currentMaxVertex = v;
+                        currentMaxWeight = weights.get(v);
+                    }
+                }
+                // is this the last iteration?
+                if (i == weights.size() - 1) {
+                    // is this a better result?
+                    if (currentMaxWeight < minCut) {
+                        minCut = currentMaxWeight;
+                        bestCut = uf.getConnected(currentMaxVertex);
+                    }
+                    // shrink graph by removing t
+                    merge(prevVertex, currentMaxVertex);
+                    uf.union(prevVertex, currentMaxVertex);
+                    break;
+                } else {
+                    // not last iteration, add to seen vertices
+                    added.add(currentMaxVertex);
+                    prevVertex = currentMaxVertex;
+                    // ...and update weights of all vertices adjacent to it
+                    for (var to : getAdjacentNodes(currentMaxVertex)) {
+                        if (!added.contains(to)) {
+                            weights.merge(to, getWeight(currentMaxVertex, to), Long::sum);
+                        }
+                    }
+                }
+            }
+        }
+        return bestCut;
+    }
+
+    private void merge(N s, N t) {
+        // merge t into s (for the minCut algorithm)
+        for (N u : getAdjacentNodes(t)) {
+            if (u == null) {
+                continue;
+            }
+            if (!u.equals(s)) {
+                long w = getWeight(t, u);
+                weights.computeIfAbsent(s, x -> new HashMap<>()).merge(u, w, Long::sum);
+                weights.computeIfAbsent(u, x -> new HashMap<>()).merge(s, w, Long::sum);
+            }
+            weights.get(u).remove(t);
+        }
+        // remove t
+        weights.remove(t);
     }
 }
