@@ -1,6 +1,5 @@
 package nl.tvandijk.aoc.year2023.day25;
 
-import java.util.*;
 import nl.tvandijk.aoc.common.Day;
 import nl.tvandijk.aoc.util.*;
 

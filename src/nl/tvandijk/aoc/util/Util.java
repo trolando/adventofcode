@@ -165,4 +165,12 @@ public class Util {
         if (includeBorder) return area/2 + 1 + boundary/2;
         else return area/2 + 1 - boundary/2;
     }
+
+    public static <T> Map<T, Long> frequency(Collection<T> items) {
+        Map<T, Long> res = new HashMap<>();
+        for (var it : items) {
+            res.compute(it, (key, v) -> v == null ? 1 : 1+v);
+        }
+        return res;
+    }
 }
