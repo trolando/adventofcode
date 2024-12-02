@@ -2,6 +2,10 @@ package nl.tvandijk.aoc.util;
 
 import java.util.*;
 
+/**
+ * Implementation of Floyd Warshall which computes the minimum distances between all points in the Graph.
+ * Contrary to Dijkstra, also works with negative weights.
+ */
 public class FloydWarshall<N> {
     private Graph<N> graph;
     private Map<Pair<N, N>, Long> distances = new HashMap<>();

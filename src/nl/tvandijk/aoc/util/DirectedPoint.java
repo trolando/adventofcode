@@ -1,5 +1,9 @@
 package nl.tvandijk.aoc.util;
 
+/**
+ * Represent a token on some point p, facing a direction d.
+ * Allows moving the point forward/left/right.
+ */
 public class DirectedPoint {
     public final Point p;
     public final Direction d;

@@ -7,6 +7,10 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+/**
+ * Implementation of Dijkstra's shortest path algorithm for a Graph<N>.
+ * Does not work with negative distances.
+ */
 public class Dijkstra<N> {
     private final Graph<N> graph;
     private final Map<Pair<N, N>, Long> distances = new HashMap<>();

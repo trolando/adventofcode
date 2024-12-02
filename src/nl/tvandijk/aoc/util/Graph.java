@@ -239,6 +239,11 @@ public class Graph<N> {
         return Pair.of(distance, null);
     }
 
+    /**
+     * Apply edge compression, as long as nodes are connected with only two edges, extend the edge.
+     * This skips the original target.
+     * @return a new graph with only compressed edges.
+     */
     public Graph<N> edgeCompress() {
         return new Graph<>(state -> {
             var successors = new ArrayList<Pair<N, Long>>();
@@ -265,6 +270,12 @@ public class Graph<N> {
         });
     }
 
+    /**
+     * Find the longest path between two nodes in the graph.
+     * @param initial the source node
+     * @param goal the target node
+     * @return the path as a list, and the total distance (sum of weights)
+     */
     public Pair<List<N>, Long> longestPath(N initial, N goal) {
         List<N> best = null;
         long bestLength = -1L;
@@ -311,6 +322,10 @@ public class Graph<N> {
         return Pair.of(best, bestLength);
     }
 
+    /**
+     * Find the minimal cut set of the Graph
+     * @return the edges, the cut set, and the remaining nodes
+     */
     public Triple<Set<Pair<N, N>>, Set<N>, Set<N>> minCut() {
         var p = new Graph<>(this).minCutPartition();
         var res = new HashSet<Pair<N, N>>();
@@ -326,6 +341,10 @@ public class Graph<N> {
         return Triple.of(res, p, o);
     }
 
+    /**
+     * Compute the minimal cut set partition.
+     * @return the nodes that, when removed, separate the graph into two parts
+     */
     private Set<N> minCutPartition() {
         var uf = new UnionFind<N>();
         long minCut = Long.MAX_VALUE;
