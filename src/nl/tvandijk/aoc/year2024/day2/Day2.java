@@ -1,8 +1,8 @@
 package nl.tvandijk.aoc.year2024.day2;
 
-import java.util.*;
 import nl.tvandijk.aoc.common.Day;
-import nl.tvandijk.aoc.util.*;
+
+import java.util.Arrays;
 
 public class Day2 extends Day {
     boolean isSafeUp(long[] numbers) {
@@ -46,7 +46,7 @@ public class Day2 extends Day {
         int sum=0;
         for (var line : lines) {
             var numbers = Arrays.stream(line.split(" ")).mapToLong(Long::parseLong).toArray();
-            for (int i = -1; i < numbers.length; i++) {
+            for (int i = 0; i < numbers.length; i++) {
                 var nn = remove(numbers, i);
                 if (isSafeUp(nn) || isSafeDown(nn)) {
                     sum++;
