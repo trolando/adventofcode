@@ -3,6 +3,7 @@ package nl.tvandijk.aoc.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class Point {
     public final long x;
@@ -80,10 +81,78 @@ public class Point {
         return delta(0, 1);
     }
 
+    public Point nw() {
+        return delta(-1, -1);
+    }
+
+    public Point ne() {
+        return delta(1, -1);
+    }
+
+    public Point sw() {
+        return delta(-1, 1);
+    }
+
+    public Point se() {
+        return delta(1, 1);
+    }
+
     public boolean inside(long minx, long miny, long width, long height) {
         long maxx = minx+width;
         long maxy = miny+height;
         return this.x >= minx && this.x < maxx && this.y >= miny && this.y < maxy;
+    }
+
+    /**
+     * Returns a Stream of Points representing the four cardinal directions (horizontal and vertical).
+     * These are relative directions: up (0, -1), down (0, 1), left (-1, 0), right (1, 0).
+     * @return a Stream of Points
+     */
+    public static Stream<Point> dirs4() {
+        return Stream.of(
+                Point.of(0, -1), // Up
+                Point.of(0, 1),  // Down
+                Point.of(-1, 0), // Left
+                Point.of(1, 0)   // Right
+        );
+    }
+
+    /**
+     * Returns a Stream of Points representing all eight directions (horizontal, vertical, and diagonal).
+     * These are relative directions: up (0, -1), down (0, 1), left (-1, 0), right (1, 0),
+     * and the four diagonals.
+     * @return a Stream of Points
+     */
+    public static Stream<Point> dirs8() {
+        return Stream.of(
+                Point.of(0, -1),  // Up
+                Point.of(0, 1),   // Down
+                Point.of(-1, 0),  // Left
+                Point.of(1, 0),   // Right
+                Point.of(-1, -1), // Top-left
+                Point.of(-1, 1),  // Bottom-left
+                Point.of(1, -1),  // Top-right
+                Point.of(1, 1)    // Bottom-right
+        );
+    }
+
+    /**
+     * Adds another point to this point, scaled by a multiplier.
+     * @param other the point to add
+     * @param multiplier the factor by which to scale the other point
+     * @return a new Point resulting from the addition
+     */
+    public Point add(Point other, long multiplier) {
+        return new Point(this.x + other.x * multiplier, this.y + other.y * multiplier);
+    }
+
+    /**
+     * Adds another point to this point.
+     * @param other the point to add
+     * @return a new Point resulting from the addition
+     */
+    public Point add(Point other) {
+        return add(other, 1); // Default multiplier of 1
     }
 
     @Override

@@ -1,6 +1,8 @@
 package nl.tvandijk.aoc.util;
 
 import java.util.*;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Grid {
     private char def;
@@ -235,6 +237,92 @@ public class Grid {
             }
         }
         return res;
+    }
+
+    /**
+     * Get a Stream of all rows as strings
+     * @return a Stream of rows
+     */
+    public Stream<String> rows() {
+        return Arrays.stream(grid).map(String::new);
+    }
+
+    /**
+     * Get a Stream of all columns as strings
+     * @return a Stream of columns
+     */
+    public Stream<String> cols() {
+        return Stream.iterate(0, x -> x + 1)
+                .limit(width())
+                .map(this::getColumn);
+    }
+
+    /**
+     * Get a Stream of all diagonals as strings
+     * This includes both top-left to bottom-right and top-right to bottom-left diagonals
+     * @return a Stream of diagonals
+     */
+    public Stream<String> diags() {
+        // Top-left to bottom-right diagonals
+        Stream<String> mainDiagonals = Stream.concat(
+                Stream.iterate(0, i -> i + 1).limit(height())
+                        .map(this::getDiagonalTopLeftToBottomRightFromRow),
+                Stream.iterate(1, i -> i + 1).limit(width() - 1)
+                        .map(this::getDiagonalTopLeftToBottomRightFromCol)
+        );
+
+        // Top-right to bottom-left diagonals
+        Stream<String> antiDiagonals = Stream.concat(
+                Stream.iterate(0, i -> i + 1).limit(height())
+                        .map(this::getDiagonalTopRightToBottomLeftFromRow),
+                Stream.iterate(0, i -> i + 1).limit(width() - 1)
+                        .map(this::getDiagonalTopRightToBottomLeftFromCol)
+        );
+
+        return Stream.concat(mainDiagonals, antiDiagonals);
+    }
+
+    private String getDiagonalTopLeftToBottomRightFromRow(int row) {
+        var sb = new StringBuilder();
+        for (int x = 0, y = row; x < width() && y < height(); x++, y++) {
+            sb.append(grid[y][x]);
+        }
+        return sb.toString();
+    }
+
+    private String getDiagonalTopLeftToBottomRightFromCol(int col) {
+        var sb = new StringBuilder();
+        for (int x = col, y = 0; x < width() && y < height(); x++, y++) {
+            sb.append(grid[y][x]);
+        }
+        return sb.toString();
+    }
+
+    private String getDiagonalTopRightToBottomLeftFromRow(int row) {
+        var sb = new StringBuilder();
+        for (int x = width() - 1, y = row; x >= 0 && y < height(); x--, y++) {
+            sb.append(grid[y][x]);
+        }
+        return sb.toString();
+    }
+
+    private String getDiagonalTopRightToBottomLeftFromCol(int col) {
+        var sb = new StringBuilder();
+        for (int x = col, y = 0; x >= 0 && y < height(); x--, y++) {
+            sb.append(grid[y][x]);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Get a Stream of all points in the grid.
+     * @return a Stream of Point objects
+     */
+    public Stream<Point> points() {
+        return IntStream.range(0, height())
+                .boxed()
+                .flatMap(y -> IntStream.range(0, width())
+                        .mapToObj(x -> Point.of(x, y)));
     }
 
     @Override
