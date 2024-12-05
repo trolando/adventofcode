@@ -2,6 +2,8 @@ package nl.tvandijk.aoc.util;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class Util {
     public static <T> Set<Pair<T,T>> getPairs(Collection<T> collection) {
@@ -172,5 +174,88 @@ public class Util {
             res.compute(it, (key, v) -> v == null ? 1 : 1+v);
         }
         return res;
+    }
+
+    public static Stream<int[]> permute(int[] nums) {
+        // Create an iterator for lazy generation
+        Iterator<int[]> iterator = new RecursivePermutationIterator(nums);
+        // Convert the iterator into a Stream
+        return StreamSupport.stream(((Iterable<int[]>) () -> iterator).spliterator(), false);
+    }
+
+    private static class RecursivePermutationIterator implements Iterator<int[]> {
+        private final int[] nums;
+        private final int[] currentPermutation;
+        private final int[] indices;
+        private boolean hasMore;
+
+        public RecursivePermutationIterator(int[] nums) {
+            this.nums = nums.clone(); // Clone to avoid modifying the input
+            this.currentPermutation = nums.clone();
+            this.indices = new int[nums.length];
+            for (int i = 0; i < nums.length; i++) {
+                indices[i] = i;
+            }
+            this.hasMore = nums.length > 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return hasMore;
+        }
+
+        @Override
+        public int[] next() {
+            if (!hasMore) throw new IllegalStateException("No more permutations");
+
+            // Clone the current permutation to return
+            int[] result = currentPermutation.clone();
+
+            // Generate the next permutation in-place
+            hasMore = generateNextPermutation();
+
+            return result;
+        }
+
+        private boolean generateNextPermutation() {
+            int i = indices.length - 1;
+            while (i > 0 && indices[i - 1] >= indices[i]) {
+                i--;
+            }
+
+            if (i <= 0) return false;
+
+            int j = indices.length - 1;
+            while (indices[j] <= indices[i - 1]) {
+                j--;
+            }
+
+            // Swap the indices
+            swap(indices, i - 1, j);
+
+            // Reverse the tail
+            reverse(indices, i, indices.length - 1);
+
+            // Rebuild the current permutation based on indices
+            for (int k = 0; k < indices.length; k++) {
+                currentPermutation[k] = nums[indices[k]];
+            }
+
+            return true;
+        }
+
+        private void swap(int[] array, int i, int j) {
+            int temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+
+        private void reverse(int[] array, int start, int end) {
+            while (start < end) {
+                swap(array, start, end);
+                start++;
+                end--;
+            }
+        }
     }
 }
