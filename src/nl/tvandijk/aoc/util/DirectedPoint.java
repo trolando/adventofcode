@@ -1,5 +1,7 @@
 package nl.tvandijk.aoc.util;
 
+import java.util.Objects;
+
 /**
  * Represent a token on some point p, facing a direction d.
  * Allows moving the point forward/left/right.
@@ -43,5 +45,25 @@ public class DirectedPoint {
             case DOWN, SOUTH -> { return new DirectedPoint(p, Direction.LEFT); }
         }
         throw new RuntimeException("Unknown direction: " + d);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        DirectedPoint that = (DirectedPoint) o;
+        return Objects.equals(p, that.p) && d == that.d;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(p, d);
+    }
+
+    @Override
+    public String toString() {
+        return "DirectedPoint{" +
+                "p=" + p +
+                ", d=" + d +
+                '}';
     }
 }

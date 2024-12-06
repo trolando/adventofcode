@@ -103,6 +103,18 @@ public class Grid {
         return res;
     }
 
+    public Point findOne(char ch) {
+        var res = new HashSet<Point>();
+        for (int x = 0; x < grid[0].length; x++) {
+            for (int y = 0; y < grid.length; y++) {
+                if (grid[y][x] == ch) {
+                    return Point.of(x, y);
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Get the character at a given point
      * @param x the x coordinate
