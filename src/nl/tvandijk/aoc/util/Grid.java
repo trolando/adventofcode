@@ -135,6 +135,14 @@ public class Grid {
         return line[(int)x];
     }
 
+    public boolean inRange(Point p) {
+        if (p.x < 0) return false;
+        if (p.y < 0) return false;
+        if (p.y >= grid.length) return false;
+        if (p.x >= grid[(int) p.y].length) return false;
+        return true;
+    }
+
     /**
      * Get the character at a given point
      * @param p the point
@@ -166,6 +174,16 @@ public class Grid {
      */
     public int height() {
         return grid.length;
+    }
+
+    public Set<Character> values() {
+        Set<Character> res = new HashSet<>();
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                res.add(get(x, y));
+            }
+        }
+        return res;
     }
 
     public void set(int x, int y, char ch) {

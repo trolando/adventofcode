@@ -142,7 +142,7 @@ public class Point {
      * @param multiplier the factor by which to scale the other point
      * @return a new Point resulting from the addition
      */
-    public Point add(Point other, long multiplier) {
+    public Point plus(Point other, long multiplier) {
         return new Point(this.x + other.x * multiplier, this.y + other.y * multiplier);
     }
 
@@ -151,8 +151,16 @@ public class Point {
      * @param other the point to add
      * @return a new Point resulting from the addition
      */
-    public Point add(Point other) {
-        return add(other, 1); // Default multiplier of 1
+    public Point plus(Point other) {
+        return plus(other, 1); // Default multiplier of 1
+    }
+
+    public Point minus(Point other) {
+        return plus(other, -1);
+    }
+
+    public Point minus(Point other, long multiplier) {
+        return plus(other, -multiplier);
     }
 
     @Override

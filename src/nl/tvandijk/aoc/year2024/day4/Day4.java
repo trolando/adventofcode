@@ -6,9 +6,9 @@ import nl.tvandijk.aoc.util.Point;
 public class Day4 extends Day {
     int testXMAS(Point pt, Point dir) {
         return grid.get(pt) == 'X' &&
-                grid.get(pt.add(dir, 1)) == 'M' &&
-                grid.get(pt.add(dir, 2)) == 'A' &&
-                grid.get(pt.add(dir, 3)) == 'S' ? 1 : 0;
+                grid.get(pt.plus(dir, 1)) == 'M' &&
+                grid.get(pt.plus(dir, 2)) == 'A' &&
+                grid.get(pt.plus(dir, 3)) == 'S' ? 1 : 0;
     }
 
     @Override

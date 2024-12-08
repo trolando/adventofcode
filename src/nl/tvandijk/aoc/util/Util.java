@@ -178,18 +178,18 @@ public class Util {
 
     public static Stream<int[]> permute(int[] nums) {
         // Create an iterator for lazy generation
-        Iterator<int[]> iterator = new RecursivePermutationIterator(nums);
+        Iterator<int[]> iterator = new RecursivePermutationIntIterator(nums);
         // Convert the iterator into a Stream
         return StreamSupport.stream(((Iterable<int[]>) () -> iterator).spliterator(), false);
     }
 
-    private static class RecursivePermutationIterator implements Iterator<int[]> {
+    private static class RecursivePermutationIntIterator implements Iterator<int[]> {
         private final int[] nums;
         private final int[] currentPermutation;
         private final int[] indices;
         private boolean hasMore;
 
-        public RecursivePermutationIterator(int[] nums) {
+        public RecursivePermutationIntIterator(int[] nums) {
             this.nums = nums.clone(); // Clone to avoid modifying the input
             this.currentPermutation = nums.clone();
             this.indices = new int[nums.length];
