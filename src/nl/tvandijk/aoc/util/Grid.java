@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class Grid {
+public class Grid implements Iterable<Pair<Point, Character>> {
     private char def;
     private char[][] grid;
     private boolean repeats = false;
@@ -368,5 +368,32 @@ public class Grid {
         int result = Objects.hash(def);
         result = 31 * result + Arrays.deepHashCode(grid);
         return result;
+    }
+
+
+    @Override
+    public Iterator<Pair<Point, Character>> iterator() {
+        return new Iterator<>() {
+            private int x = 0;
+            private int y = 0;
+
+            @Override
+            public boolean hasNext() {
+                return y < grid.length && x < grid[y].length;
+            }
+
+            @Override
+            public Pair<Point, Character> next() {
+                if (!hasNext()) throw new NoSuchElementException();
+                Point p = Point.of(x, y);
+                char ch = grid[y][x];
+                x++;
+                if (x >= grid[y].length) {
+                    x = 0;
+                    y++;
+                }
+                return new Pair<>(p, ch);
+            }
+        };
     }
 }
