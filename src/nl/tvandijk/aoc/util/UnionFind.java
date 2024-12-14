@@ -1,9 +1,6 @@
 package nl.tvandijk.aoc.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Union find data structure
@@ -78,10 +75,23 @@ public class UnionFind<N> {
         return size;
     }
 
+    /**
+     * Check if two elements are connected
+     *
+     * @param n1 the first element
+     * @param n2 the second element
+     * @return true if connected, otherwise false
+     */
     public boolean connected(N n1, N n2) {
         return find(n1) == find(n2);
     }
 
+    /**
+     * Get all elements in the set containing n
+     *
+     * @param n the element
+     * @return the elements in the set containing n
+     */
     public Set<N> getConnected(N n) {
         var p = find(n);
         var res = new HashSet<N>();
@@ -92,11 +102,11 @@ public class UnionFind<N> {
     }
 
     /**
-     * Get the largest connected set in the UnionFind structure
+     * Get all connected sets in the UnionFind structure
      *
-     * @return the largest set of connected elements
+     * @return all sets of connected elements
      */
-    public Set<N> getLargestSet() {
+    public Collection<Set<N>> getSets() {
         Map<N, Set<N>> components = new HashMap<>();
 
         // Group all elements by their root parent
@@ -105,9 +115,18 @@ public class UnionFind<N> {
             components.computeIfAbsent(root, k -> new HashSet<>()).add(n);
         }
 
+        return components.values();
+    }
+
+    /**
+     * Get the largest connected set in the UnionFind structure
+     *
+     * @return the largest set of connected elements
+     */
+    public Set<N> getLargestSet() {
         // Find the largest component
         Set<N> largestSet = new HashSet<>();
-        for (var component : components.values()) {
+        for (var component : getSets()) {
             if (component.size() > largestSet.size()) {
                 largestSet = component;
             }

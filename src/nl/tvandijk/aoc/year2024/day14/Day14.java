@@ -11,12 +11,6 @@ import javax.imageio.ImageIO;
 
 public class Day14 extends Day {
     @Override
-    protected void processInput(String fileContents) {
-        // process the input
-        super.processInput(fileContents);
-    }
-
-    @Override
     protected Object part1() {
         // part 1
         int W = 101;
@@ -31,16 +25,11 @@ public class Day14 extends Day {
             var y = (ps[1] + 100 * vs[1]) % H;
             if (x < 0) x += W;
             if (y < 0) y += H;
-//            System.out.println(x + " " + y + " " + (x/(W/2+1)) + " " + (y/(H/2+1)));
             if (x != (W/2) && y != (H/2)) {
                 sums[2*(y/(H/2+1))+(x/(W/2+1))]++;
             }
         }
-        var product = Arrays.stream(sums).reduce(1, (x,y) -> x * y);
-//        for (int i = 0; i < 4; i++) {
-//            System.out.println(sums[i]);
-//        }
-        return product;
+        return Arrays.stream(sums).reduce(1, (x,y) -> x * y);
     }
     
     public int countConnectedAreas(Collection<Point> points, boolean diagonal) {
