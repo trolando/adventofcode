@@ -22,4 +22,8 @@ public class Day%Day% extends Day {
         // part 2
         return null;
     }
+
+    public static void main(String[] args) throws Exception {
+        Day.main(args);
+    }
 }

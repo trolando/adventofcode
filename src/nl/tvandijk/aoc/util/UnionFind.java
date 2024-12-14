@@ -90,4 +90,29 @@ public class UnionFind<N> {
         }
         return res;
     }
+
+    /**
+     * Get the largest connected set in the UnionFind structure
+     *
+     * @return the largest set of connected elements
+     */
+    public Set<N> getLargestSet() {
+        Map<N, Set<N>> components = new HashMap<>();
+
+        // Group all elements by their root parent
+        for (var n : parent.keySet()) {
+            var root = find(n); // Find the root parent
+            components.computeIfAbsent(root, k -> new HashSet<>()).add(n);
+        }
+
+        // Find the largest component
+        Set<N> largestSet = new HashSet<>();
+        for (var component : components.values()) {
+            if (component.size() > largestSet.size()) {
+                largestSet = component;
+            }
+        }
+
+        return largestSet;
+    }
 }

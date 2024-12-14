@@ -73,53 +73,30 @@ public class Day12 extends Day {
                         }
                     });
                 }
-                // check perimeter
+                // compute perimeter
                 long perim = 0L;
-                // sort all points
-                Set<DirectedPoint> seenPerim = new HashSet<>();
-                var sorted = new ArrayList<>(block);
-                Collections.sort(sorted, (a, b) -> {
-                    if (a.y == b.y) return Long.compare(a.x, b.x);
-                    else return Long.compare(a.y, b.y);
-                });
-                for (var p : sorted) {
-                    if (!block.contains(p.up()) && !seenPerim.contains(DirectedPoint.of(p, Direction.UP))) {
-                        perim++;
-                        var pp = p;
-                        while (grid.inRange(pp) && block.contains(pp) && !block.contains(pp.up())) {
-                            seenPerim.add(DirectedPoint.of(pp, Direction.UP));
-                            pp = pp.right();
-                        }
-                    }
-                    if (!block.contains(p.right()) && !seenPerim.contains(DirectedPoint.of(p, Direction.RIGHT))) {
-                        perim++;
-                        var pp = p;
-                        while (grid.inRange(pp) && block.contains(pp) && !block.contains(pp.right())) {
-                            seenPerim.add(DirectedPoint.of(pp, Direction.RIGHT));
-                            pp = pp.down();
-                        }
-                    }
-                    if (!block.contains(p.down()) && !seenPerim.contains(DirectedPoint.of(p, Direction.DOWN))) {
-                        perim++;
-                        var pp = p;
-                        while (grid.inRange(pp) && block.contains(pp) && !block.contains(pp.down())) {
-                            seenPerim.add(DirectedPoint.of(pp, Direction.DOWN));
-                            pp = pp.right();
-                        }
-                    }
-                    if (!block.contains(p.left()) && !seenPerim.contains(DirectedPoint.of(p, Direction.LEFT))) {
-                        perim++;
-                        var pp = p;
-                        while (grid.inRange(pp) && block.contains(pp) && !block.contains(pp.left())) {
-                            seenPerim.add(DirectedPoint.of(pp, Direction.LEFT));
-                            pp = pp.down();
-                        }
-                    }
+                for (Point p : block) {
+                    boolean up = block.contains(p.up());
+                    boolean down = block.contains(p.down());
+                    boolean left = block.contains(p.left());
+                    boolean right = block.contains(p.right());
+                    if (!up && !left) perim++;
+                    if (up && left && !block.contains(p.up().left())) perim++;
+                    if (!up && !right) perim++;
+                    if (up && right && !block.contains(p.up().right())) perim++;
+                    if (!down && !left) perim++;
+                    if (down && left && !block.contains(p.down().left())) perim++;
+                    if (!down && !right) perim++;
+                    if (down && right && !block.contains(p.down().right())) perim++;
                 }
                 sum += perim * block.size();
                 seen.addAll(block);
             }
         }
         return sum;
+    }
+
+    public static void main(String[] args) throws Exception {
+        Day.main(args);
     }
 }
