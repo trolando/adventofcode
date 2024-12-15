@@ -26,4 +26,9 @@ public class Day%Day% extends Day {
     public static void main(String[] args) throws Exception {
         Day.main(args);
     }
+
+    public Day%Day%() {
+        super("example.txt", "input.txt");
+//        super("example.txt");
+    }
 }

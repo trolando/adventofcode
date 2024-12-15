@@ -17,36 +17,24 @@ public class Day14 extends Day {
         int H = 103;
         var sums = new int[4];
         for (var line : lines) {
-            var L = line.split(" ");
-            var ps = Arrays.stream(L[0].substring(2).split(",")).mapToInt(Integer::parseInt).toArray();
-            var vs = Arrays.stream(L[1].substring(2).split(",")).mapToInt(Integer::parseInt).toArray();
+            var ns = numbers(line);
+            var origin = Point.of(ns[0], ns[1]);
+            var delta = Point.of(ns[2], ns[3]);
             // location after 100 steps
-            var x = (ps[0] + 100 * vs[0]) % W;
-            var y = (ps[1] + 100 * vs[1]) % H;
+            var x = (origin.x + 100 * delta.x) % W;
+            var y = (origin.y + 100 * delta.y) % H;
             if (x < 0) x += W;
             if (y < 0) y += H;
             if (x != (W/2) && y != (H/2)) {
-                sums[2*(y/(H/2+1))+(x/(W/2+1))]++;
+                sums[(int) (2*(y/(H/2+1))+(x/(W/2+1)))]++;
             }
         }
         return Arrays.stream(sums).reduce(1, (x,y) -> x * y);
     }
     
-    public int countConnectedAreas(Collection<Point> points, boolean diagonal) {
-        var uf = new UnionFind<Point>();
-        for (var point : points) {
-            uf.find(point); // initialize
-            for (var pp : point.adjacent(diagonal)) {
-                if (points.contains(pp)) uf.union(point, pp);
-            }
-        }
-        return uf.getNumberOfSets();
-    }
-
     public int countLargestArea(Collection<Point> points, boolean diagonal) {
         var uf = new UnionFind<Point>();
         for (var point : points) {
-            // uf.find(point); // initialize
             for (var pp : point.adjacent(diagonal)) {
                 if (points.contains(pp)) uf.union(point, pp);
             }
@@ -61,15 +49,15 @@ public class Day14 extends Day {
         int H = 103;
         Map<Point, List<Point>> points = new HashMap<>();
         for (var line : lines) {
-            var L = line.split(" ");
-            var ps = Arrays.stream(L[0].substring(2).split(",")).mapToInt(Integer::parseInt).toArray();
-            var vs = Arrays.stream(L[1].substring(2).split(",")).mapToInt(Integer::parseInt).toArray();
-            points.putIfAbsent(Point.of(ps[0], ps[1]), new ArrayList<>());
-            points.get(Point.of(ps[0], ps[1])).add(Point.of(vs[0], vs[1]));
+            var ns = numbers(line);
+            var origin = Point.of(ns[0], ns[1]);
+            var delta = Point.of(ns[2], ns[3]);
+            points.putIfAbsent(origin, new ArrayList<>());
+            points.get(origin).add(delta);
         }
-        for (int i = 0; i <= 10000; i++) {
+        for (int i = 0; i <= W*H; i++) {
             var largest = countLargestArea(points.keySet(), false);
-            if (largest > 50) {
+            if (largest > 30) {
                 exportImage("step " + i + ".png", W, H, points);
                 printImage("Step " + i + ":", W, H, points);
                 return i;

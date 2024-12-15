@@ -3,6 +3,9 @@ package nl.tvandijk.aoc.common;
 import nl.tvandijk.aoc.util.Grid;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Base class for the Advent of Code puzzles
@@ -57,6 +60,27 @@ public abstract class Day {
         this.lines = this.fileContents.split("\n"); // supports linux/windows, not older mac
         this.grid = Grid.of(lines);
         this.tokens = this.fileContents.split("\\s+");
+    }
+
+    private final Pattern numbersPattern = Pattern.compile("-?\\d+");
+    private final Pattern digitsPattern = Pattern.compile("\\d+");
+
+    protected long[] numbers(String line) {
+        List<Long> list = new ArrayList<>();
+        var matcher = numbersPattern.matcher(line);
+        while (matcher.find()) {
+            list.add(Long.parseLong(matcher.group()));
+        }
+        return list.stream().mapToLong(Long::longValue).toArray();
+    }
+
+    protected long[] digits(String line) {
+        List<Long> list = new ArrayList<>();
+        var matcher = digitsPattern.matcher(line);
+        while (matcher.find()) {
+            list.add(Long.parseLong(matcher.group()));
+        }
+        return list.stream().mapToLong(Long::longValue).toArray();
     }
 
     /**
