@@ -38,7 +38,7 @@ public class Dijkstra<N> {
             for (N adjacent : graph.getAdjacentNodes(top)) {
                 long currentDistance = graph.getWeight(top, adjacent) + distance.get(top);
 
-                if (currentDistance < distance.get(adjacent)) {
+                if (currentDistance < distance.getOrDefault(adjacent, Long.MAX_VALUE)) {
                     distance.put(adjacent, currentDistance);
                 }
 
@@ -53,6 +53,6 @@ public class Dijkstra<N> {
             distances.put(Pair.of(source, m.getKey()), m.getValue());
         }
 
-        return distance.get(target);
+        return distance.getOrDefault(target, Long.MAX_VALUE);
     }
 }

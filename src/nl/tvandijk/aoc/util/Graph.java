@@ -1,11 +1,25 @@
 package nl.tvandijk.aoc.util;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Represents a graph with nodes of type N.
  */
 public class Graph<N> {
+    /**
+     * A function that determines the successors of a node.
+     */
+    public interface WeightedSuccessorFunction<N> {
+        /**
+         * Determine the successors of a node.
+         *
+         * @param state the node
+         * @return a collection of pairs of adjacent nodes and their weight/distance
+         */
+        Collection<Pair<N, Long>> successors(N state);
+    }
+
     /**
      * A function that determines the successors of a node.
      */
@@ -16,7 +30,17 @@ public class Graph<N> {
          * @param state the node
          * @return a collection of pairs of adjacent nodes and their weight/distance
          */
-        Collection<Pair<N, Long>> successors(N state);
+        Collection<N> successors(N state);
+    }
+
+    public interface SuccessorStreamFunction<N> {
+        /**
+         * Determine the successors of a node.
+         *
+         * @param state the node
+         * @return a collection of pairs of adjacent nodes and their weight/distance
+         */
+        Stream<N> successors(N state);
     }
 
     /**
@@ -33,7 +57,8 @@ public class Graph<N> {
     }
 
     private final Map<N, Map<N, Long>> weights = new HashMap<>();
-    private final SuccessorFunction<N> successorFunction;
+    private final Map<N, Set<N>> predecessors = new HashMap<>();
+    private final WeightedSuccessorFunction<N> successorFunction;
     private final Dijkstra<N> dijkstra = new Dijkstra<>(this);
     private final FloydWarshall<N> floydWarshall = new FloydWarshall<>(this);
 
@@ -49,8 +74,18 @@ public class Graph<N> {
      *
      * @param successorFunction the successor function
      */
-    public Graph(SuccessorFunction<N> successorFunction) {
+    public Graph(WeightedSuccessorFunction<N> successorFunction) {
         this.successorFunction = successorFunction;
+    }
+
+    public static <N> Graph<N> of(SuccessorFunction<N> successorFunction) {
+        return new Graph<>(node -> {
+            Set<Pair<N, Long>> res = new HashSet<>();
+            for (var nn : successorFunction.successors(node)) {
+                res.add(Pair.of(nn, 1L));
+            }
+            return res;
+        });
     }
 
     public Graph(Graph<N> other) {
@@ -71,10 +106,23 @@ public class Graph<N> {
             var res = new HashMap<N, Long>();
             if (successorFunction != null) {
                 var edges = successorFunction.successors(node);
-                edges.forEach(s -> res.put(s.a, s.b));
+                edges.forEach(s -> {
+                    res.put(s.a, s.b);
+                    predecessors.compute(s.a, (kk, vv) ->
+                    {
+                        if (vv == null) vv = new HashSet<>();
+                        vv.add(k);
+                        return vv;
+                    });
+                });
             }
             return res;
         });
+    }
+
+    public void clearWeights() {
+        weights.clear();
+        predecessors.clear();
     }
 
     /**
@@ -96,6 +144,10 @@ public class Graph<N> {
      */
     public Set<N> getAdjacentNodes(N node) {
         return getEdges(node).keySet();
+    }
+
+    public Set<N> getPredecessors(N node) {
+        return predecessors.getOrDefault(node, Set.of());
     }
 
     /**
@@ -145,6 +197,10 @@ public class Graph<N> {
      */
     public FloydWarshall<N> floydWarshall() {
         return floydWarshall;
+    }
+
+    public Map<N, Long> reachAll(N initial) {
+        return reachAll(Set.of(initial));
     }
 
     /**
@@ -409,5 +465,45 @@ public class Graph<N> {
         }
         // remove t
         weights.remove(t);
+    }
+
+    // Bron-Kerbosch algorithm recursive implementation
+    public List<Set<N>> findMaximalCliques() {
+        List<Set<N>> cliques = new ArrayList<>();
+        Set<N> R = new HashSet<>();
+        Set<N> P = new HashSet<>(getAllNodes());
+        Set<N> X = new HashSet<>();
+        bronKerboschWithPivot(R, P, X, cliques);
+        return cliques;
+    }
+
+    private void bronKerboschWithPivot(Set<N> R, Set<N> P, Set<N> X, List<Set<N>> cliques) {
+        if (P.isEmpty() && X.isEmpty()) {
+            cliques.add(new HashSet<>(R));
+            return;
+        }
+
+        Set<N> union = new HashSet<>(P);
+        union.addAll(X);
+        N pivot = union.iterator().next();
+        Set<N> nonNeighbors = new HashSet<>(P);
+        nonNeighbors.removeAll(getAdjacentNodes(pivot));
+
+        for (N node : nonNeighbors) {
+            R.add(node);
+            Set<N> neighbors = getAdjacentNodes(node);
+
+            Set<N> newP = new HashSet<>(P);
+            newP.retainAll(neighbors);
+
+            Set<N> newX = new HashSet<>(X);
+            newX.retainAll(neighbors);
+
+            bronKerboschWithPivot(R, newP, newX, cliques);
+
+            R.remove(node);
+            P.remove(node);
+            X.add(node);
+        }
     }
 }

@@ -1,11 +1,13 @@
 package nl.tvandijk.aoc.year2024.day16;
 
+import nl.tvandijk.aoc.common.Day;
+import nl.tvandijk.aoc.util.DirectedPoint;
+import nl.tvandijk.aoc.util.Direction;
+import nl.tvandijk.aoc.util.Graph;
+import nl.tvandijk.aoc.util.Pair;
+
 import java.util.*;
 import java.util.stream.Collectors;
-
-import nl.tvandijk.aoc.common.Day;
-import nl.tvandijk.aoc.util.*;
-import scala.concurrent.impl.FutureConvertersImpl;
 
 public class Day16 extends Day {
     private Set<Pair<DirectedPoint, Long>> successor(DirectedPoint dp) {
@@ -85,7 +87,7 @@ public class Day16 extends Day {
         // part 1
         var start = grid.findOne('S');
         var end = grid.findOne('E');
-        var graph = new Graph<DirectedPoint>(this::successor);
+        var graph = new Graph<>(this::successor);
         graph = graph.edgeCompress();
         var res = graph.reachAll(Set.of(DirectedPoint.of(start, Direction.RIGHT)));
         return res.keySet().stream().filter(p -> p.p.equals(end)).mapToLong(res::get).min().orElse(0);

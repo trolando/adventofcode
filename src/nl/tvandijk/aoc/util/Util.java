@@ -258,4 +258,32 @@ public class Util {
             }
         }
     }
+
+    /**
+     * Utility method to perform a binary search to find the first integer in the range where the predicate is true.
+     *
+     * @param first     The starting integer of the search range (inclusive).
+     * @param last      The ending integer of the search range (exclusive).
+     * @param predicate A lambda function or predicate to evaluate.
+     * @return The first integer in the range where the predicate is true, or -1 if no such integer exists.
+     */
+    public static int bisect(int first, int last, Predicate<Integer> predicate) {
+        int low = first;
+        int high = last - 1;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (predicate.test(mid)) {
+                // Check if this is the first occurrence where the predicate is true
+                if (mid == first || !predicate.test(mid - 1)) {
+                    return mid;
+                }
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+
+        return -1; // Not found
+    }
 }

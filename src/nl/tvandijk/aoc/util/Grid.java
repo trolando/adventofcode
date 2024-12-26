@@ -1,6 +1,7 @@
 package nl.tvandijk.aoc.util;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -38,6 +39,11 @@ public class Grid implements Iterable<Pair<Point, Character>> {
         for (int i = 0; i < g.grid.length; i++) {
             grid[i] = Arrays.copyOf(g.grid[i], g.grid[i].length);
         }
+    }
+
+    private Grid(char[][] grid, char def) {
+        this.grid = grid;
+        this.def = def;
     }
 
     /**
@@ -84,6 +90,23 @@ public class Grid implements Iterable<Pair<Point, Character>> {
      */
     public static Grid of(List<String> lines) {
         return new Grid(lines, '.');
+    }
+
+    public static Grid of(Collection<Point> points, long width, long height) {
+        char[][] grid = new char[(int) height][(int) width];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                grid[y][x] = '.';
+            }
+        }
+        for (var pt : points) {
+            grid[(int) pt.y][(int) pt.x] = '#';
+        }
+        return new Grid(grid, '#');
+    }
+
+    public Graph<Point> graph(Graph.SuccessorStreamFunction<Point> successor, Predicate<Character> pred) {
+        return Graph.of(pt -> successor.successors(pt).filter(this::inRange).filter(p -> pred.test(get(p))).toList());
     }
 
     /**

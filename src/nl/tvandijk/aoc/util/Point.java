@@ -22,6 +22,10 @@ public class Point {
         return new Point(x, y);
     }
 
+    public static Point of(long[] arr) {
+        return new Point(arr[0], arr[1]);
+    }
+
     public long manhattan(Point other) {
         return Math.abs(x-other.x) + Math.abs(y-other.y);
     }
@@ -117,6 +121,10 @@ public class Point {
         );
     }
 
+    public Stream<Point> adjacent4() {
+        return Stream.of(up(), down(), left(), right());
+    }
+
     /**
      * Returns a Stream of Points representing all eight directions (horizontal, vertical, and diagonal).
      * These are relative directions: up (0, -1), down (0, 1), left (-1, 0), right (1, 0),
@@ -134,6 +142,10 @@ public class Point {
                 Point.of(1, -1),  // Top-right
                 Point.of(1, 1)    // Bottom-right
         );
+    }
+
+    public Stream<Point> adjacent8() {
+        return Stream.of(up(), down(), left(), right(), ne(), nw(), se(), sw());
     }
 
     /**
